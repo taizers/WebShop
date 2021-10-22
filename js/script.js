@@ -114,8 +114,8 @@ const productsData = [];
 
 const getproductsDate = () => {
   const date = Date.now();
-  const lastDate = date - MAX_DAYS_BEFORE;
-  const productDate = getRandom(lastDate, date);
+  const randomDate = getRandom(0, MAX_DAYS_BEFORE);
+  const productDate = date -randomDate;
   let productDateStr;
   if (productDate<=date && productDate>date-YESTERDAY) {
     productDateStr = "Сегодня";
@@ -132,19 +132,24 @@ const getproductsDate = () => {
 const getPhotos = () => {
   const photos = [];
   for (let index = 0; index < getRandom(MIN_COUNT_PHOTO, MAX_COUNT_PHOTO); index++) {
+    let photoFileName ="";
     do {
-      let photoFileName = `img/${photoFileNames[getRandom(0, photoFileNames.length - 1)]}`;
+      photoFileName = `img/${photoFileNames[getRandom(0, photoFileNames.length - 1)]}`;
     } while (photos.includes(photoFileName));
     photos.push(photoFileName);
   }
   return photos;
 }
 
+const numberWithSpaces = (x) => {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
+
 for (let index = 0; index < MAX_VIEW_PRODUCT_COUNT; index++) {
   const productData = {
     "name": names[getRandom(0, names.length - 1)],
     "description": descriptions[getRandom(0, descriptions.length - 1)],
-    "price": Math.round(getRandom(MIN_PRICE,MAX_PRICE) / 100) * 100,
+    "price": numberWithSpaces(Math.round(getRandom(MIN_PRICE,MAX_PRICE) / 100) * 100),
     "category": CATEGORY,
     "seller": {
       "fullname": fullNames[getRandom(0, fullNames.length - 1)],
@@ -170,7 +175,8 @@ productsData.forEach(element => {
   console.log(element);
 });
 
-const addElem = (productData) => {
+
+const addCardData = (productData) => {
 
   const li = document.createElement('li');
   li.classList.add('product');
@@ -202,7 +208,7 @@ const catalogList = document.querySelector('.results__list');
 const renderCatalogList = () => {
   const fragment = document.createDocumentFragment();
   productsSortCopyArr.slice(0, MAX_VIEW_PRODUCT_COUNT).forEach((it) => {
-    fragment.appendChild(addElem(it));
+    fragment.appendChild(addCardData(it));
   });
 
   catalogList.innerHTML = '';
@@ -214,12 +220,12 @@ renderCatalogList();
 const modal = document.querySelector(".popup");
 const productImages = document.querySelectorAll(".product__image");
 const productTitles = document.querySelectorAll(".product__title");
-const productCloseBtn = document.querySelector(".popup__close");
+const productCloseBtn = modal.querySelector(".popup__close");
 
-const modalTitle = document.querySelector(".popup__title");
-const modalDate = document.querySelector(".popup__date");
-const modalPrice = document.querySelector(".popup__price");
-const modalGalery = document.querySelector(".gallery__list");
+const modalTitle = modal.querySelector(".popup__title");
+const modalDate = modal.querySelector(".popup__date");
+const modalPrice = modal.querySelector(".popup__price");
+const modalGalery = modal.querySelector(".gallery__list");
 
 const renderModalItemData = (index) =>{
 
