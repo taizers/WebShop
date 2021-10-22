@@ -225,15 +225,32 @@ const closeModal = () => {
   modal.classList.remove("popup__active");
 };
 
-const onCloseBtnClick = (evt) => {
+const onCloseBtnClick = () => {
   closeModal();
   removeModalListeners();
 };
 
-const onShowClick = (evt) => {
+const onShowClick = () => {
   openModal();
   initModalListeners();
 };
+
+const onModalMoveOutClose = () => {
+  document.removeEventListener('keydown',onModalKeyDownClose);
+  document.removeEventListener('mouseout',onModalMoveOutClose);
+}
+
+const onModalKeyDownClose = (evt) => {
+  if (evt.keyCode === 13) {
+    evt.preventDefault();
+    onCloseBtnClick();
+  };
+}
+
+const onCloseBtnMove = (evt) => {
+  document.addEventListener('keydown',onModalKeyDownClose);
+  document.addEventListener('mouseout',onModalMoveOutClose);
+}
 
 const onModalKeyDown = (evt) => {
   if (evt.keyCode === 27) {
@@ -243,18 +260,21 @@ const onModalKeyDown = (evt) => {
 };
 
 const onModalOutLineClick = (evt) =>{
-  if (evt.target === "main") {
+  console.log(evt.target);
+  if (evt.target === modal) {
       onCloseBtnClick();
   }
 };
 
 const removeModalListeners = () => {
     productCloseBtn.removeEventListener("click",onCloseBtnClick);
+    productCloseBtn.removeEventListener("mouseover",onCloseBtnMove);
     document.removeEventListener('keydown',onModalKeyDown); 
     window.removeEventListener("click",onModalOutLineClick);
 };
 const initModalListeners = () => {  
     productCloseBtn.addEventListener("click",onCloseBtnClick);
+    productCloseBtn.addEventListener("mouseover",onCloseBtnMove);
     document.addEventListener('keydown',onModalKeyDown); 
     window.addEventListener("click",onModalOutLineClick);
 };
