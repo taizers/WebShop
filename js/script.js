@@ -17,7 +17,7 @@ const MAX_DAYS_BEFORE = 518400000;
 const YESTERDAY = 86400000;
 const BEFORE_YESTERDAY = 172800000;
 const CATEGORY = "Недвижимость";
-
+const CURRENCY = "₽";
 
 var mySlider = new rSlider({
   target: '#sampleSlider',
@@ -132,10 +132,9 @@ const getproductsDate = () => {
 const getPhotos = () => {
   const photos = [];
   for (let index = 0; index < getRandom(MIN_COUNT_PHOTO, MAX_COUNT_PHOTO); index++) {
-    let photoFileName = `img/${photoFileNames[getRandom(0, photoFileNames.length - 1)]}`;
-    while (photos.includes(photoFileName)) {
-      photoFileName =`img/${photoFileNames[getRandom(0, photoFileNames.length - 1)]}`;
-    }
+    do {
+      let photoFileName = `img/${photoFileNames[getRandom(0, photoFileNames.length - 1)]}`;
+    } while (photos.includes(photoFileName));
     photos.push(photoFileName);
   }
   return photos;
@@ -189,7 +188,7 @@ const addElem = (productData) => {
         <h3 class="product__title">
           <a href="#">${productData.name}</a>
         </h3>
-        <div class="product__price">${productData.price} ₽</div>
+        <div class="product__price">${productData.price} ${CURRENCY}</div>
         <div class="product__address">${productData.adress.city}, ${productData.adress.street}</div>
         <div class="product__date">${productData.publishDate}</div>
       </div>
@@ -217,6 +216,15 @@ const productImages = document.querySelectorAll(".product__image");
 const productTitles = document.querySelectorAll(".product__title");
 const productCloseBtn = document.querySelector(".popup__close");
 
+const modalTitle = document.querySelector(".popup__title");
+const modalDate = document.querySelector(".popup__date");
+const modalPrice = document.querySelector(".popup__price");
+const modalGalery = document.querySelector(".gallery__list");
+
+const renderModalItemData = (index) =>{
+
+}
+
 const openModal = () => {
   modal.classList.add("popup__active");
 };
@@ -230,9 +238,10 @@ const onCloseBtnClick = () => {
   removeModalListeners();
 };
 
-const onShowClick = () => {
-  openModal();
+const onShowClick = (index) => {
+  renderModalItemData(index);
   initModalListeners();
+  openModal();
 };
 
 const onModalMoveOutClose = () => {
@@ -282,9 +291,9 @@ const initModalListeners = () => {
 
 for (let index = 0; index < productTitles.length; index++) {
   productTitles[index].addEventListener('click', (evt) => {
-    onShowClick();
+    onShowClick(index);
   })
   productImages[index].addEventListener('click', (evt) => {
-    onShowClick();
+    onShowClick(index);
   })
 }
