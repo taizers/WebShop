@@ -118,21 +118,23 @@ const getTeg = (textTeg) =>{
 
 const productsData = [];
 
-const getproductsDate = () => {
+const getNumbersDate = () =>{
   const date = Date.now();
   const randomDate = getRandom(0, MAX_DAYS_BEFORE);
-  const productDate = date -randomDate;
-  let productDateStr;
-  if (productDate<=date && productDate>date-YESTERDAY) {
-    productDateStr = "Сегодня";
+  return date - randomDate;
+}
+
+const getproductsDate = (productDate) => {
+  const date = Date.now();
+  if (productDate <= date && productDate > date - YESTERDAY) {
+    return "Сегодня";
   } else
-  if (productDate<=date-YESTERDAY && productDate>date-BEFORE_YESTERDAY) {
-    productDateStr = "Вчера";
+  if (productDate <= date - YESTERDAY && productDate > date - BEFORE_YESTERDAY) {
+    return "Вчера";
   }else
   {
-    productDateStr = `${new Date(productDate).getDay() + 1} ${months[new Date(productDate).getMonth()]} ${new Date(productDate).getFullYear()} года`;
+    return `${new Date(productDate).getDay() + 1} ${months[new Date(productDate).getMonth()]} ${new Date(productDate).getFullYear()} года`;
   }
-  return productDateStr;
 }
 
 const getPhotos = () => {
@@ -155,13 +157,13 @@ for (let index = 0; index < MAX_VIEW_PRODUCT_COUNT; index++) {
   const productData = {
     "name": names[getRandom(0, names.length - 1)],
     "description": descriptions[getRandom(0, descriptions.length - 1)],
-    "price": numberWithSpaces(Math.round(getRandom(MIN_PRICE,MAX_PRICE) / 100) * 100),
+    "price": Math.round(getRandom(MIN_PRICE,MAX_PRICE) / 100) * 100,
     "category": CATEGORY,
     "seller": {
       "fullName": fullNames[getRandom(0, fullNames.length - 1)],
       "rating": Math.ceil(getRandomFloat(MIN_RATING, MAX_RATING) * 10) / 10
     },
-    "publishDate": getproductsDate(),
+    "publishDate": getNumbersDate(),
     "adress": {
       "city": citys[getRandom(0, citys.length - 1)],
       "street": streets[getRandom(0, streets.length - 1)],
@@ -196,9 +198,9 @@ const productCard = (productData) =>{
       <h3 class="product__title">
         <a href="#">${productData.name}</a>
       </h3>
-      <div class="product__price">${productData.price} ${CURRENCY}</div>
+      <div class="product__price">${numberWithSpaces(productData.price)} ${CURRENCY}</div>
       <div class="product__address">${productData.adress.city}, ${productData.adress.street}</div>
-      <div class="product__date">${productData.publishDate}</div>
+      <div class="product__date">${getproductsDate(productData.publishDate)}</div>
     </div>
   </li>
 `;
@@ -213,9 +215,9 @@ const productEventCard = (productData) =>{
         <path fill-rule="evenodd" clip-rule="evenodd" d="M0.292893 0.292893C0.683418 -0.0976311 1.31658 -0.0976311 1.70711 0.292893L8 6.58579L14.2929 0.292893C14.6834 -0.0976311 15.3166 -0.0976311 15.7071 0.292893C16.0976 0.683418 16.0976 1.31658 15.7071 1.70711L9.41421 8L15.7071 14.2929C16.0976 14.6834 16.0976 15.3166 15.7071 15.7071C15.3166 16.0976 14.6834 16.0976 14.2929 15.7071L8 9.41421L1.70711 15.7071C1.31658 16.0976 0.683418 16.0976 0.292893 15.7071C-0.0976311 15.3166 -0.0976311 14.6834 0.292893 14.2929L6.58579 8L0.292893 1.70711C-0.0976311 1.31658 -0.0976311 0.683418 0.292893 0.292893Z"/>
       </svg>
     </button>
-    <div class="popup__date">${productData.publishDate}</div>
+    <div class="popup__date">${getproductsDate(productData.publishDate)}</div>
     <h3 class="popup__title">${productData.name}</h3>
-    <div class="popup__price">${productData.price} ${CURRENCY}</div>
+    <div class="popup__price">${numberWithSpaces(productData.price)} ${CURRENCY}</div>
     <div class="popup__columns">
       <div class="popup__left">
         <div class="popup__gallery gallery">
@@ -289,24 +291,47 @@ const productGaleryImage = (photoLink, alt) =>{
   return textTeg;
 };
 
-let productsSortCopyArr = productsData.slice();
+let productsCopyArr = productsData.slice();
 const catalogList = document.querySelector('.results__list');
+const sortPriceBtn = document.querySelector(".sorting__price");
+const sortPopularBtn = document.querySelector(".sorting__popular");
+const sortDateBtn = document.querySelector(".sorting__date");
 
-const renderCatalogList = () => {
-  const fragment = document.createDocumentFragment();
-  productsSortCopyArr.slice(0, MAX_VIEW_PRODUCT_COUNT).forEach((it) => {
-    fragment.appendChild(getTeg(productCard(it)));
-  });
+//////////////////////              СОРТИРОВКА                    //////////////////////////////////
 
-  catalogList.innerHTML = '';
-  catalogList.appendChild(fragment);
+const sortProductPrice = (a, b) => {
+  const aSort = a.price;
+  const bSort = b.price;
+  
+  return aSort-bSort;
+};
+const sortProductDate = (a, b) => {
+  const aSort = a.publishDate;
+  const bSort = b.publishDate;
+  
+  return aSort-bSort;
 };
 
-renderCatalogList();
+const onSortPriceBtnClick = () => {
+  productsCopyArr = productsData.slice();
+  productsCopyArr.sort(sortProductPrice);
+  renderCatalogList();
+};
+
+const onSortDateBtnClick = () => {
+  productsCopyArr = productsData.slice();
+  productsCopyArr.sort(sortProductDate).reverse();
+  renderCatalogList();
+};
+
+const onSortPopularBtnClick = () => {
+  productsCopyArr = productsData.slice();
+  renderCatalogList();
+};
+
+//////////////////////              СОРТИРОВКА                    //////////////////////////////////
 
 const modal = document.querySelector(".popup");
-const productImages = document.querySelectorAll(".product__image");
-const productTitles = document.querySelectorAll(".product__title");
 
 const renderPhotos = (producElementData) => {
   const modalGalery = modal.querySelector(".gallery__list");
@@ -339,11 +364,11 @@ const addListenerOnGalery = () =>{
 
 const renderModalItemData = (index) =>{
   const fragment = document.createDocumentFragment();
-  fragment.appendChild(getTeg(productEventCard(productsSortCopyArr[index])));
+  fragment.appendChild(getTeg(productEventCard(productsCopyArr[index])));
 
   modal.innerHTML = '';
   modal.appendChild(fragment);
-  renderPhotos(productsSortCopyArr[index]);
+  renderPhotos(productsCopyArr[index]);
   addListenerOnGalery();
 };
 
@@ -401,6 +426,37 @@ const onModalOutLineClick = (evt) =>{
   }
 };
 
+const addLinksToCards = () =>{
+  const productImages = document.querySelectorAll(".product__image");
+  const productTitles = document.querySelectorAll(".product__title");
+  for (let index = 0; index < productTitles.length; index++) {
+    productTitles[index].addEventListener('click', (evt) => {
+      onShowClick(index);
+    })
+    productImages[index].addEventListener('click', (evt) => {
+      onShowClick(index);
+    })
+  }
+};
+
+const renderCatalogList = () => {
+  const fragment = document.createDocumentFragment();
+
+  productsCopyArr.slice(0, MAX_VIEW_PRODUCT_COUNT).forEach((it) => {
+    fragment.appendChild(getTeg(productCard(it)));
+  });
+
+  catalogList.innerHTML = '';
+  catalogList.appendChild(fragment);
+  addLinksToCards();
+};
+
+renderCatalogList();
+
+sortPriceBtn.addEventListener('click',onSortPriceBtnClick); 
+sortDateBtn.addEventListener('click',onSortDateBtnClick); 
+sortPopularBtn.addEventListener('click',onSortPopularBtnClick); 
+
 const removeModalListeners = (modalCloseBtn) => {
     modalCloseBtn.removeEventListener("click",onCloseBtnClick);
     modalCloseBtn.removeEventListener("mouseover",onCloseBtnMove);
@@ -415,14 +471,7 @@ const initModalListeners = (modalCloseBtn) => {
 };
  
 
-for (let index = 0; index < productTitles.length; index++) {
-  productTitles[index].addEventListener('click', (evt) => {
-    onShowClick(index);
-  })
-  productImages[index].addEventListener('click', (evt) => {
-    onShowClick(index);
-  })
-}
+
 
 
 
