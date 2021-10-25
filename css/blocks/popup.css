@@ -10,7 +10,7 @@
   background-color: var(--popup-overlay);
 }
 
-.popup__active {
+.popup--active {
   display: block;
 }
 

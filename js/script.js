@@ -15,7 +15,7 @@ const MAX_ROOM_COUNT = 7;
 const MAX_VIEW_PRODUCT_COUNT = 7;
 const MAX_DAYS_BEFORE = 518400000;
 const YESTERDAY = 86400000;
-const BEFORE_YESTERDAY = 172800000;
+const BEFORE_YESTERDAY = 172800000;//переименовать
 const CATEGORY = "Недвижимость";
 const CURRENCY = "₽";
 
@@ -30,7 +30,7 @@ var mySlider = new rSlider({
 });
 
 function getRandom(min, max) {
-  let rand = min - 0.5 + Math.random() * (max - min + 1);
+  let rand = min - 0.5 + Math.random() * (max - min + 1); // рандом переделать
   return Math.round(rand);
 }
 
@@ -124,7 +124,7 @@ const getNumbersDate = () =>{
   return date - randomDate;
 }
 
-const getproductsDate = (productDate) => {
+const getProductsDate = (productDate) => {
   const date = Date.now();
   if (productDate <= date && productDate > date - YESTERDAY) {
     return "Сегодня";
@@ -200,7 +200,7 @@ const productCard = (productData) =>{
       </h3>
       <div class="product__price">${numberWithSpaces(productData.price)} ${CURRENCY}</div>
       <div class="product__address">${productData.adress.city}, ${productData.adress.street}</div>
-      <div class="product__date">${getproductsDate(productData.publishDate)}</div>
+      <div class="product__date">${getProductsDate(productData.publishDate)}</div>
     </div>
   </li>
 `;
@@ -215,7 +215,7 @@ const productEventCard = (productData) =>{
         <path fill-rule="evenodd" clip-rule="evenodd" d="M0.292893 0.292893C0.683418 -0.0976311 1.31658 -0.0976311 1.70711 0.292893L8 6.58579L14.2929 0.292893C14.6834 -0.0976311 15.3166 -0.0976311 15.7071 0.292893C16.0976 0.683418 16.0976 1.31658 15.7071 1.70711L9.41421 8L15.7071 14.2929C16.0976 14.6834 16.0976 15.3166 15.7071 15.7071C15.3166 16.0976 14.6834 16.0976 14.2929 15.7071L8 9.41421L1.70711 15.7071C1.31658 16.0976 0.683418 16.0976 0.292893 15.7071C-0.0976311 15.3166 -0.0976311 14.6834 0.292893 14.2929L6.58579 8L0.292893 1.70711C-0.0976311 1.31658 -0.0976311 0.683418 0.292893 0.292893Z"/>
       </svg>
     </button>
-    <div class="popup__date">${getproductsDate(productData.publishDate)}</div>
+    <div class="popup__date">${getProductsDate(productData.publishDate)}</div>
     <h3 class="popup__title">${productData.name}</h3>
     <div class="popup__price">${numberWithSpaces(productData.price)} ${CURRENCY}</div>
     <div class="popup__columns">
@@ -230,18 +230,6 @@ const productEventCard = (productData) =>{
             <img src="${productData.photos[0]}" width="520" height="340" alt="${productData.name}">
           </div>
           <ul class="gallery__list">
-            <li class="gallery__item gallery__item--active">
-              <img src="img/house_1.png" width="124" height="80" alt="Загородный дом">
-            </li>
-            <li class="gallery__item">
-              <img src="img/house_2.png" width="124" height="80" alt="Загородный дом">
-            </li>
-            <li class="gallery__item">
-              <img src="img/house_3.png" width="124" height="80" alt="Загородный дом">
-            </li>
-            <li class="gallery__item">
-              <img src="img/house_4.png" width="124" height="80" alt="Загородный дом">
-            </li>
           </ul>
         </div>
         <ul class="popup__chars chars">
@@ -291,25 +279,25 @@ const productGaleryImage = (photoLink, alt) =>{
   return textTeg;
 };
 
-let productsCopyArr = productsData.slice();
+const productsCopyArr = productsData.slice();
 const catalogList = document.querySelector('.results__list');
 const sortPriceBtn = document.querySelector(".sorting__price");
 const sortPopularBtn = document.querySelector(".sorting__popular");
 const sortDateBtn = document.querySelector(".sorting__date");
 
-//////////////////////              СОРТИРОВКА                    //////////////////////////////////
+//////////////////////              SORT                    //////////////////////////////////
 
-const sortProductPrice = (a, b) => {
-  const aSort = a.price;
-  const bSort = b.price;
+const sortProductPrice = (firstElement, SecondElement) => {
+  const firstElementSort = firstElement.price;
+  const SecondElementSort = SecondElement.price;
   
-  return aSort-bSort;
+  return firstElementSort-SecondElementSort;
 };
-const sortProductDate = (a, b) => {
-  const aSort = a.publishDate;
-  const bSort = b.publishDate;
+const sortProductDate = (firstElement, SecondElement) => {
+  const firstElementSort = firstElement.publishDate;
+  const SecondElementSort = SecondElement.publishDate;
   
-  return aSort-bSort;
+  return firstElementSort-SecondElementSort;
 };
 
 const onSortPriceBtnClick = () => {
@@ -329,7 +317,7 @@ const onSortPopularBtnClick = () => {
   renderCatalogList();
 };
 
-//////////////////////              СОРТИРОВКА                    //////////////////////////////////
+//////////////////////              SORT END                    //////////////////////////////////
 
 const modal = document.querySelector(".popup");
 
@@ -339,27 +327,21 @@ const renderPhotos = (producElementData) => {
   for (let index = 0; index < producElementData.photos.length; index++) {
     fragment.appendChild(getTeg(productGaleryImage(producElementData.photos[index],producElementData.name)));
   }
+  fragment.firstChild.classList.add("gallery__item--active");
   modalGalery.innerHTML = '';
   modalGalery.appendChild(fragment);
 };
 
-const addListenerOnGalery = () =>{
-  const galeryImages = modal.querySelectorAll(".gallery__item");
+
+const addSwapOnGalery = (evt) =>{
   const galeryMainImage = modal.querySelector(".gallery__main-pic");
 
-  galeryImages[0].classList.add("gallery__item--active");
+  findGaleryImages().forEach(image => {
+    image.classList.remove("gallery__item--active");
+  });
 
-  for (let index = 0; index < galeryImages.length; index++) {
-    galeryImages[index].addEventListener('click', (evt) => {
-        if (!galeryImages[index].classList.contains("gallery__item--active")) {
-          for (let index = 0; index < galeryImages.length; index++) {
-            galeryImages[index].classList.remove("gallery__item--active");
-          }
-          galeryImages[index].classList.add("gallery__item--active");
-          galeryMainImage.firstElementChild.src = galeryImages[index].firstElementChild.src;
-        }
-    })
-  }
+  evt.currentTarget.classList.add("gallery__item--active");
+  galeryMainImage.firstElementChild.src = evt.target.src;
 };
 
 const renderModalItemData = (index) =>{
@@ -369,7 +351,6 @@ const renderModalItemData = (index) =>{
   modal.innerHTML = '';
   modal.appendChild(fragment);
   renderPhotos(productsCopyArr[index]);
-  addListenerOnGalery();
 };
 
 const findCloseButton = () => {
@@ -377,12 +358,17 @@ const findCloseButton = () => {
   return modalCloseBtn;
 };
 
+const findGaleryImages = () => {
+  const galeryImages = modal.querySelectorAll(".gallery__item");
+  return galeryImages;
+};
+
 const openModal = () => {
-  modal.classList.add("popup__active");
+  modal.classList.add("popup--active");
 };
 
 const closeModal = () => {
-  modal.classList.remove("popup__active");
+  modal.classList.remove("popup--active");
 };
 
 const onCloseBtnClick = () => {
@@ -402,7 +388,7 @@ const onModalMoveOutClose = () => {
 }
 
 const onModalKeyDownClose = (evt) => {
-  if (evt.keyCode === 13) {
+  if (evt.key === "Enter") {
     evt.preventDefault();
     onCloseBtnClick();
   };
@@ -414,7 +400,7 @@ const onCloseBtnMove = (evt) => {
 }
 
 const onModalKeyDown = (evt) => {
-  if (evt.keyCode === 27) {
+  if (evt.key === "Escape") {
     evt.preventDefault();
     onCloseBtnClick();
   };
@@ -426,9 +412,10 @@ const onModalOutLineClick = (evt) =>{
   }
 };
 
-const addLinksToCards = () =>{
+const addListenersToCards = () =>{
   const productImages = document.querySelectorAll(".product__image");
   const productTitles = document.querySelectorAll(".product__title");
+  /*
   for (let index = 0; index < productTitles.length; index++) {
     productTitles[index].addEventListener('click', (evt) => {
       onShowClick(index);
@@ -436,7 +423,16 @@ const addLinksToCards = () =>{
     productImages[index].addEventListener('click', (evt) => {
       onShowClick(index);
     })
-  }
+  }*/
+  console.log(typeof(productTitles));
+  
+  productTitles.forEach(element => {
+    element.addEventListener('click', onShowClick());
+  });
+  productImages.forEach(element => {
+    element.addEventListener('click', onShowClick());
+  });
+  
 };
 
 const renderCatalogList = () => {
@@ -445,10 +441,10 @@ const renderCatalogList = () => {
   productsCopyArr.slice(0, MAX_VIEW_PRODUCT_COUNT).forEach((it) => {
     fragment.appendChild(getTeg(productCard(it)));
   });
-
+  //удалить обработчики и добавить именование обработчикам 
   catalogList.innerHTML = '';
   catalogList.appendChild(fragment);
-  addLinksToCards();
+  addListenersToCards();
 };
 
 renderCatalogList();
@@ -458,12 +454,18 @@ sortDateBtn.addEventListener('click',onSortDateBtnClick);
 sortPopularBtn.addEventListener('click',onSortPopularBtnClick); 
 
 const removeModalListeners = (modalCloseBtn) => {
+    findGaleryImages().forEach(item => {
+      item.removeEventListener('click', addSwapOnGalery)
+    });
     modalCloseBtn.removeEventListener("click",onCloseBtnClick);
     modalCloseBtn.removeEventListener("mouseover",onCloseBtnMove);
     document.removeEventListener('keydown',onModalKeyDown); 
     window.removeEventListener("click",onModalOutLineClick);
 };
 const initModalListeners = (modalCloseBtn) => {  
+    findGaleryImages().forEach(item => {
+      item.addEventListener('click', addSwapOnGalery)
+    });
     modalCloseBtn.addEventListener("click",onCloseBtnClick);
     modalCloseBtn.addEventListener("mouseover",onCloseBtnMove);
     document.addEventListener('keydown',onModalKeyDown); 
