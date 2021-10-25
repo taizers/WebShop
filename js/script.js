@@ -230,21 +230,31 @@ const productEventCard = (productData) =>{
             <img src="${productData.photos[0]}" width="520" height="340" alt="${productData.name}">
           </div>
           <ul class="gallery__list">
+          ${renderPhotos(productData.photos, productData.name)}
           </ul>
         </div>
         <ul class="popup__chars chars">
-          <li class="chars__item">
-            <div class="chars__name">Площадь</div>
-            <div class="chars__value">${productData.filters.area}</div>
-          </li>
-          <li class="chars__item">
-            <div class="chars__name">Количество комнат</div>
-            <div class="chars__value">${productData.filters.roomsCount}</div>
-          </li>
-          <li class="chars__item">
-            <div class="chars__name">Тип недвижимости</div>
-            <div class="chars__value">${productData.filters.type}</div>
-          </li>
+          ${productData.filters.area != "" ?  
+            `<li class="chars__item">
+              <div class="chars__name">Площадь</div>
+              <div class="chars__value">${productData.filters.area}</div>
+            </li>`
+            : ""
+          }
+          ${productData.filters.roomsCount != "" ?  
+            `<li class="chars__item">
+              <div class="chars__name">Количество комнат</div>
+              <div class="chars__value">${productData.filters.roomsCount}</div>
+            </li>`
+            : ""
+          }
+          ${productData.filters.type != "" ?  
+            `<li class="chars__item">
+              <div class="chars__name">Тип недвижимости</div>
+              <div class="chars__value">${productData.filters.type}</div>
+            </li>`
+            : ""
+          }
         </ul>
         <div class="popup__seller seller seller--good">
           <h3>Продавец</h3>
@@ -270,16 +280,7 @@ const productEventCard = (productData) =>{
   return textTeg;
 };
 
-const productGaleryImage = (photoLink, alt) =>{ 
-  const textTeg = `
-  <li class="gallery__item">
-    <img src="${photoLink}" width="124" height="80" alt="${alt}">
-  </li>
-`;
-  return textTeg;
-};
-
-const productsCopyArr = productsData.slice();
+let productsCopyArr = productsData.slice();
 const catalogList = document.querySelector('.results__list');
 const sortPriceBtn = document.querySelector(".sorting__price");
 const sortPopularBtn = document.querySelector(".sorting__popular");
@@ -321,17 +322,17 @@ const onSortPopularBtnClick = () => {
 
 const modal = document.querySelector(".popup");
 
-const renderPhotos = (producElementData) => {
-  const modalGalery = modal.querySelector(".gallery__list");
-  const fragment = document.createDocumentFragment();
-  for (let index = 0; index < producElementData.photos.length; index++) {
-    fragment.appendChild(getTeg(productGaleryImage(producElementData.photos[index],producElementData.name)));
-  }
-  fragment.firstChild.classList.add("gallery__item--active");
-  modalGalery.innerHTML = '';
-  modalGalery.appendChild(fragment);
+const renderPhotos = (photos, name) => {
+  let images = "";
+  photos.forEach((element, index) => {
+    images += `
+      <li class="gallery__item ${ (index === 0) ? "gallery__item--active" : ""}">
+        <img src="${element}" width="124" height="80" alt="${name}">
+      </li>
+    `;
+  });
+  return images;
 };
-
 
 const addSwapOnGalery = (evt) =>{
   const galeryMainImage = modal.querySelector(".gallery__main-pic");
@@ -350,7 +351,6 @@ const renderModalItemData = (index) =>{
 
   modal.innerHTML = '';
   modal.appendChild(fragment);
-  renderPhotos(productsCopyArr[index]);
 };
 
 const findCloseButton = () => {
@@ -415,7 +415,15 @@ const onModalOutLineClick = (evt) =>{
 const addListenersToCards = () =>{
   const productImages = document.querySelectorAll(".product__image");
   const productTitles = document.querySelectorAll(".product__title");
-  /*
+
+/*
+  productTitles.forEach((element, index) => {
+    element.addEventListener('click', onShowClick(index));
+  });
+  productImages.forEach((element, index) => {
+    element.addEventListener('click', onShowClick(index));
+  });
+*/
   for (let index = 0; index < productTitles.length; index++) {
     productTitles[index].addEventListener('click', (evt) => {
       onShowClick(index);
@@ -423,16 +431,25 @@ const addListenersToCards = () =>{
     productImages[index].addEventListener('click', (evt) => {
       onShowClick(index);
     })
+  }
+  /*
+  for (let index = 0; index < productTitles.length; index++) {
+    productTitles[index].addEventListener('click', onShowClick(index));
+    productImages[index].addEventListener('click', onShowClick(index));
   }*/
-  console.log(typeof(productTitles));
-  
-  productTitles.forEach(element => {
-    element.addEventListener('click', onShowClick());
+};
+
+const onFavoritesClick = (element, index) =>{
+  if (element.classList.contains("fav-add")) {
+      
+  }
+}
+
+const addFavorites = () => {
+  const favoriteAddBtns = document.querySelectorAll(".product__favourite");
+  favoriteAddBtns.forEach((element, index) => {
+    element.addEventListener('click', onFavoritesClick(element, index));
   });
-  productImages.forEach(element => {
-    element.addEventListener('click', onShowClick());
-  });
-  
 };
 
 const renderCatalogList = () => {
@@ -441,10 +458,11 @@ const renderCatalogList = () => {
   productsCopyArr.slice(0, MAX_VIEW_PRODUCT_COUNT).forEach((it) => {
     fragment.appendChild(getTeg(productCard(it)));
   });
-  //удалить обработчики и добавить именование обработчикам 
   catalogList.innerHTML = '';
   catalogList.appendChild(fragment);
   addListenersToCards();
+  addFavorites();
+ 
 };
 
 renderCatalogList();
@@ -453,28 +471,32 @@ sortPriceBtn.addEventListener('click',onSortPriceBtnClick);
 sortDateBtn.addEventListener('click',onSortDateBtnClick); 
 sortPopularBtn.addEventListener('click',onSortPopularBtnClick); 
 
-const removeModalListeners = (modalCloseBtn) => {
-    findGaleryImages().forEach(item => {
-      item.removeEventListener('click', addSwapOnGalery)
-    });
-    modalCloseBtn.removeEventListener("click",onCloseBtnClick);
-    modalCloseBtn.removeEventListener("mouseover",onCloseBtnMove);
-    document.removeEventListener('keydown',onModalKeyDown); 
-    window.removeEventListener("click",onModalOutLineClick);
-};
 const initModalListeners = (modalCloseBtn) => {  
-    findGaleryImages().forEach(item => {
-      item.addEventListener('click', addSwapOnGalery)
-    });
-    modalCloseBtn.addEventListener("click",onCloseBtnClick);
-    modalCloseBtn.addEventListener("mouseover",onCloseBtnMove);
-    document.addEventListener('keydown',onModalKeyDown); 
-    window.addEventListener("click",onModalOutLineClick);
+  findGaleryImages().forEach(item => {
+    item.addEventListener('click', addSwapOnGalery)
+  });
+  modalCloseBtn.addEventListener("click",onCloseBtnClick);
+  modalCloseBtn.addEventListener("mouseover",onCloseBtnMove);
+  document.addEventListener('keydown',onModalKeyDown); 
+  window.addEventListener("click",onModalOutLineClick);
 };
- 
+const removeModalListeners = (modalCloseBtn) => {
+  findGaleryImages().forEach(item => {
+    item.removeEventListener('click', addSwapOnGalery)
+  });
+  modalCloseBtn.removeEventListener("click",onCloseBtnClick);
+  modalCloseBtn.removeEventListener("mouseover",onCloseBtnMove);
+  document.removeEventListener('keydown',onModalKeyDown); 
+  window.removeEventListener("click",onModalOutLineClick);
+};
+
+////////////////////////////////////////  FILTERS   //////////////////////////////////////
 
 
 
+////////////////////////////////////////  FILTERS END   //////////////////////////////////////
+
+////////////////////////////////////////  FAVORITES   //////////////////////////////////////
 
 
-
+////////////////////////////////////////  FAVORITES END   //////////////////////////////////////
