@@ -91,7 +91,7 @@ const photoFileNames = [
 
 const types = [
   "house",
-  "apartment",
+  "apartments",
   "flat",
 ];
 
@@ -441,7 +441,7 @@ const addListenersToCards = () =>{
 
 const onFavoritesClick = (element, index) =>{
   if (element.classList.contains("fav-add")) {
-      
+
   }
 }
 
@@ -492,7 +492,121 @@ const removeModalListeners = (modalCloseBtn) => {
 
 ////////////////////////////////////////  FILTERS   //////////////////////////////////////
 
+const filterBtn = document.querySelector(".filter__button");
 
+const filterRoomsCount = document.getElementsByName("rooms");
+const filtertypesBuild = document.getElementsByName("estate-type");
+const filterMinArea = document.getElementById("square");
+
+const minPrice = 0;
+const maxPrice = 2000000;
+
+const getFilterRoomsResult = () =>{
+  let count = 0;
+  filterRoomsCount.forEach(element => {
+      if (element.checked) {
+        switch (element.value) {
+          case "one":
+            count = 1;
+            break;
+          case "two":
+            count = 2;
+            break;
+          case "three":
+            count = 3;
+            break;
+          case "four":
+            count = 4;
+            break;
+          case "fivemore":
+            count = 5;
+            break;
+        }
+      }
+  });
+  return count;
+};
+
+const getElementsOnPrice = (min, max, elements) => {
+  let arr =[];
+  elements.forEach(element => {
+    if (element.price > min && element.price < max) {
+      arr.push(element);
+    }
+  });
+  return arr;
+};
+
+const getTypes = (filtertypes) => {
+  let arr = [];
+  filtertypes.forEach(element => {
+    if (element.checked) {
+      arr.push(element.value);
+    } 
+  });
+  return arr;
+};
+
+const getElementsOnType = (elements) => {
+  let arr = [];
+  const typesArr = getTypes(filtertypesBuild);
+  elements.forEach(element => {
+    if (typesArr.includes(element.filters.type)) {
+      arr.push(element);
+    }
+  });
+  return arr;
+};
+
+const getElementsOnMinArea = (elements) =>{
+  let arr = [];
+  elements.forEach(element => {
+    if (element.filters.area > filterMinArea.value) {
+      arr.push(element);
+    }
+  });
+  return arr;
+};
+
+const getElementsOnCountRooms = (elements) => {
+  let arr = [];
+  const filterRooms = getFilterRoomsResult();
+  if (filterRooms != 5) {
+    elements.forEach(element => {
+      if (element.filters.roomsCount === filterRooms) {
+        arr.push(element);
+      }
+    });
+  }
+  else{
+    elements.forEach(element => {
+      if (element.filters.roomsCount >= filterRooms) {
+        arr.push(element);
+      }
+    });
+  }
+  return arr;
+};
+
+const onFilterBtnClick = (evt) => {
+  evt.preventDefault();
+  let productsFilterArr = productsData.slice(0, MAX_VIEW_PRODUCT_COUNT);
+  productsFilterArr = getElementsOnPrice(minPrice, maxPrice, productsFilterArr);
+  if (getTypes(filtertypesBuild).length != 0) {
+    productsFilterArr = getElementsOnType(productsFilterArr);
+  }
+  if (filterMinArea.value != "") {
+    productsFilterArr = getElementsOnMinArea(productsFilterArr);
+  }
+  if (getFilterRoomsResult() != "") {
+    productsFilterArr = getElementsOnCountRooms(productsFilterArr);
+  }
+  productsCopyArr = productsFilterArr;
+  renderCatalogList();
+
+};
+
+filterBtn.addEventListener("click", onFilterBtnClick);
 
 ////////////////////////////////////////  FILTERS END   //////////////////////////////////////
 
