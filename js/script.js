@@ -13,9 +13,9 @@ const MAX_AREA_COUNT = 250;
 const MIN_ROOM_COUNT = 1;
 const MAX_ROOM_COUNT = 7;
 const MAX_VIEW_PRODUCT_COUNT = 7;
-const MAX_DAYS_BEFORE = 518400000;
-const YESTERDAY = 86400000;
-const BEFORE_YESTERDAY = 172800000;//переименовать
+const WEEK_IN_MS = 518400000;
+const ONE_DAY_IN_MS = 86400000;
+const TWO_DAYS_IN_MS = 172800000;//переименовать
 const CATEGORY = "Недвижимость";
 const CURRENCY = "₽";
 
@@ -120,16 +120,16 @@ const productsData = [];
 
 const getNumbersDate = () =>{
   const date = Date.now();
-  const randomDate = getRandom(0, MAX_DAYS_BEFORE);
+  const randomDate = getRandom(0, WEEK_IN_MS);
   return date - randomDate;
 }
 
 const getProductsDate = (productDate) => {
   const date = Date.now();
-  if (productDate <= date && productDate > date - YESTERDAY) {
+  if (productDate <= date && productDate > date - ONE_DAY_IN_MS) {
     return "Сегодня";
   } else
-  if (productDate <= date - YESTERDAY && productDate > date - BEFORE_YESTERDAY) {
+  if (productDate <= date - ONE_DAY_IN_MS && productDate > date - TWO_DAYS_IN_MS) {
     return "Вчера";
   }else
   {
@@ -155,6 +155,7 @@ const numberWithSpaces = (x) => {
 
 for (let index = 0; index < MAX_VIEW_PRODUCT_COUNT; index++) {
   const productData = {
+    "card_id" : `card_${index}`,
     "name": names[getRandom(0, names.length - 1)],
     "description": descriptions[getRandom(0, descriptions.length - 1)],
     "price": Math.round(getRandom(MIN_PRICE,MAX_PRICE) / 100) * 100,
@@ -164,7 +165,7 @@ for (let index = 0; index < MAX_VIEW_PRODUCT_COUNT; index++) {
       "rating": Math.ceil(getRandomFloat(MIN_RATING, MAX_RATING) * 10) / 10
     },
     "publishDate": getNumbersDate(),
-    "adress": {
+    "address": {
       "city": citys[getRandom(0, citys.length - 1)],
       "street": streets[getRandom(0, streets.length - 1)],
       "building": `${getRandom(MIN_BUILDING_NUMBER, MAX_BUILDING_NUMBER)}`
@@ -185,7 +186,7 @@ productsData.forEach(element => {
 
 const productCard = (productData) =>{ 
   const textTeg = `
-  <li class="results__item product">
+  <li class="results__item product" id = "${productData.card_id}">
     <button class="product__favourite fav-add" type="button" aria-label="Добавить в избранное">
       <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path fill-rule="evenodd" clip-rule="evenodd" d="M3 7C3 13 10 16.5 11 17C12 16.5 19 13 19 7C19 4.79086 17.2091 3 15 3C12 3 11 5 11 5C11 5 10 3 7 3C4.79086 3 3 4.79086 3 7Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
@@ -199,7 +200,7 @@ const productCard = (productData) =>{
         <a href="#">${productData.name}</a>
       </h3>
       <div class="product__price">${numberWithSpaces(productData.price)} ${CURRENCY}</div>
-      <div class="product__address">${productData.adress.city}, ${productData.adress.street}</div>
+      <div class="product__address">${productData.address.city}, ${productData.address.street}</div>
       <div class="product__date">${getProductsDate(productData.publishDate)}</div>
     </div>
   </li>
@@ -270,9 +271,9 @@ const productEventCard = (productData) =>{
       </div>
       <div class="popup__right">
         <div class="popup__map">
-          <img src="img/map.jpg" width="268" height="180" alt="${productData.adress.city}, ${productData.adress.street}, дом ${productData.adress.building}">
+          <img src="img/map.jpg" width="268" height="180" alt="${productData.address.city}, ${productData.address.street}, дом ${productData.address.building}">
         </div>
-        <div class="popup__address">${productData.adress.city}, ${productData.adress.street}, дом ${productData.adress.building}</div>
+        <div class="popup__address">${productData.address.city}, ${productData.address.street}, дом ${productData.address.building}</div>
       </div>
     </div>
   </div>
@@ -321,6 +322,14 @@ const onSortPopularBtnClick = () => {
 //////////////////////              SORT END                    //////////////////////////////////
 
 const modal = document.querySelector(".popup");
+
+const getCardContentData = (list, id) => {
+  for (let item of list) {
+    if (item.card_id === id) {
+      return item;
+    }
+  }
+}
 
 const renderPhotos = (photos, name) => {
   let images = "";
@@ -439,20 +448,57 @@ const addListenersToCards = () =>{
   }*/
 };
 
-const onFavoritesClick = (element, index) =>{
-  if (element.classList.contains("fav-add")) {
+localStorage.clear();
 
-  }
+const getproductsDataStorage = () => {
+  return JSON.parse(localStorage.getItem('cards'));
+};
+
+const setproductsDataStorage = (cards) => {
+  localStorage.setItem('cards', JSON.stringify(cards));
+  return false;
 }
 
+const onFavoritesClick = (evt) => {
+  this.disabled = true;
+  console.log("+");
+  const productsDataStorage = getproductsDataStorage() || [];
+  
+  if (productsDataStorage.includes(productsData[index])) {
+    evt.currentTarget.classList.remove("fav-add--checked");
+    productsDataStorage.splice(productsDataStorage.indexOf(productsData[index]), 1);
+  }else{
+    evt.currentTarget.classList.add("fav-add--checked");
+    productsDataStorage.push(productsData[index]);
+  }
+
+  if(!setproductsDataStorage(productsDataStorage)){ 
+    this.disabled = false; 
+  }
+  console.log(productsDataStorage);
+  //return false;
+
+}
+
+const findFavoriteAddBtns = () => {
+  return document.querySelectorAll(".product__favourite");
+};
+
+const removeFavorites = () => {
+  findFavoriteAddBtns().forEach((element, index) => {
+    element.removeEventListener('click', onFavoritesClick);
+  });
+};
+
 const addFavorites = () => {
-  const favoriteAddBtns = document.querySelectorAll(".product__favourite");
-  favoriteAddBtns.forEach((element, index) => {
-    element.addEventListener('click', onFavoritesClick(element, index));
+  console.log("---------------------------");
+  findFavoriteAddBtns().forEach((element, index) => {
+    element.addEventListener('click', onFavoritesClick);
   });
 };
 
 const renderCatalogList = () => {
+  removeFavorites();
   const fragment = document.createDocumentFragment();
 
   productsCopyArr.slice(0, MAX_VIEW_PRODUCT_COUNT).forEach((it) => {
@@ -461,6 +507,7 @@ const renderCatalogList = () => {
   catalogList.innerHTML = '';
   catalogList.appendChild(fragment);
   addListenersToCards();
+  
   addFavorites();
  
 };
@@ -612,5 +659,19 @@ filterBtn.addEventListener("click", onFilterBtnClick);
 
 ////////////////////////////////////////  FAVORITES   //////////////////////////////////////
 
+const sortingFavoritesBtn = document.querySelector(".sorting__favourites");
+
+const onFavoritesBtnClick = () => {
+  const productsDataStorage = getproductsDataStorage();
+  if (productsDataStorage != null) {
+    productsCopyArr = productsDataStorage;
+    renderCatalogList();
+  }
+  else{
+
+  }
+};
+
+sortingFavoritesBtn.addEventListener("click", onFavoritesBtnClick);
 
 ////////////////////////////////////////  FAVORITES END   //////////////////////////////////////
