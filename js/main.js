@@ -1,4 +1,3 @@
-
 import './modules/render-cards.js';
 import './modules/favorites.js';
 import './modules/filters.js'; 

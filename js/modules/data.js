@@ -14,7 +14,7 @@ const MIN_AREA_COUNT = 30;
 const MAX_AREA_COUNT = 250;
 const MIN_ROOM_COUNT = 1;
 const MAX_ROOM_COUNT = 7;
-const MAX_VIEW_PRODUCT_COUNT = 7;
+export const MAX_VIEW_PRODUCT_COUNT = 7;
 const WEEK_IN_MS = 518400000;
 const CATEGORY = "Недвижимость";
 
@@ -34,7 +34,7 @@ const mySlider = new rSlider({
     scale: true,
     labels: true,
     set: [MIN_PRICE, MAX_PRICE],
-    step: 1000,
+    step: 10000,
 });
 
 function getRandom(min, max) {
@@ -152,4 +152,4 @@ const getProductsData = () => {
 };
 
 export const productsData = getProductsData();
-export let productsCopyArr = productsData.slice();
+

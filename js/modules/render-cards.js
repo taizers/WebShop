@@ -1,6 +1,6 @@
 "use strict";
 
-import { productsCopyArr } from './data.js'
+import { productsData, MAX_VIEW_PRODUCT_COUNT} from './data.js'
 import { onShowModalClick, onFavoritesClick, getCardContentData, getproductsDataStorage, getProductsDate, numberWithSpaces, CURRENCY } from './open-module.js'
 import { fillHTMLTemplates, clearHTMLItem } from './render.js'
 
@@ -54,16 +54,16 @@ const addEventListenerCards = (cardsItems) =>{
     });
 };
 
-export const renderCatalogList = () => {
+export const renderCatalogList = (productsData) => {
     removeEventListenerCards(catalogList.querySelectorAll('.results__item'));
   
     clearHTMLItem(catalogList);
   
-    productsCopyArr.slice(0, MAX_VIEW_PRODUCT_COUNT).forEach((it) => {
+    productsData.slice(0, MAX_VIEW_PRODUCT_COUNT).forEach((it) => {
       fillHTMLTemplates(catalogList,productCard(it));
     });
   
     addEventListenerCards(catalogList.querySelectorAll('.results__item'));
 };
 
-renderCatalogList();
+renderCatalogList(productsData);

@@ -1,10 +1,10 @@
 "use strict";
 
 import { renderCatalogList } from './render-cards.js'
-import { productsData } from './data.js'
+import { productsData, MAX_VIEW_PRODUCT_COUNT } from './data.js'
 import { fillHTMLTemplates, clearHTMLItem } from './render.js'
 
-const filterForm = document.querySelector(".filter").querySelector("form"); 
+export const filterForm = document.querySelector(".filter").querySelector("form"); 
 
 const getSliderValues = (value) => {
     return value.split(',').map(item => +item);
@@ -105,14 +105,14 @@ const getElementsOnCountRooms = (elements, filterRoomsValue) => {
 const notFound = `<p style="text-align:center">Мы не нашли товары по вашему запросу. Попробуйте поменять
 фильтры настройки объявлений в блоке слева</p>`;
 
+export let productsCopyArr = productsData.slice(0, MAX_VIEW_PRODUCT_COUNT);
+
 const onFilterFormSubmit = (evt) => {
   evt.preventDefault();
   let productsFilterArr = productsData.slice(0, MAX_VIEW_PRODUCT_COUNT);
   const filterFormData = new FormData(filterForm);
   if (filterFormData.has("sampleSlider")) {
     productsFilterArr = getElementsOnPrice(productsFilterArr, getSliderValues(filterFormData.get("sampleSlider")));
-    
-    //filterFormData.get("sampleSlider");
   }
   if (filterFormData.has("estate-type")) {
     productsFilterArr = getElementsOnType(productsFilterArr, filterFormData);
@@ -125,12 +125,12 @@ const onFilterFormSubmit = (evt) => {
   }
   if (productsFilterArr.length != 0) {
     productsCopyArr = productsFilterArr;
-    renderCatalogList();
+    renderCatalogList(productsCopyArr);
   }else{
     clearHTMLItem(catalogList);
     fillHTMLTemplates(catalogList,notFound);
   }
-
 };
+
 
 filterForm.addEventListener("submit", onFilterFormSubmit);

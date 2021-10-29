@@ -2,9 +2,10 @@
 
 import { renderCatalogList  } from './render-cards.js'
 import { sortDateBtn, sortPriceBtn, sortPopularBtn } from './sort.js'
-import { productsData, productsCopyArr } from './data.js'
+import { productsData} from './data.js'
 import { getproductsDataStorage} from './open-module.js'
 import { fillHTMLTemplates, clearHTMLItem } from './render.js'
+import { filterForm} from './filters.js'
 
 
 const sortingFavoritesBtn = document.querySelector(".sorting__favourites");
@@ -17,8 +18,7 @@ const notFound = `<p style="text-align:center">«У вас пока нет из�
 const onFavoritesBtnClick = () => {
    
   if (!document.getElementById("favourites").checked) {
-    productsCopyArr = productsData.slice();
-    renderCatalogList();
+    renderCatalogList(productsData.slice());
     sortPriceBtn.disabled = false;
     sortPopularBtn.disabled = false;
     sortDateBtn.disabled = false;
@@ -43,15 +43,13 @@ const onFavoritesBtnClick = () => {
       });
     });
     if (productsDataStorage != null) {
-      productsCopyArr = productsDataStorage;
-      renderCatalogList();
+      renderCatalogList(productsDataStorage);
     }
     else{
       clearHTMLItem(catalogList);
       fillHTMLTemplates(catalogList,notFound);
     }
   }
-
 };
 
 sortingFavoritesBtn.addEventListener("click", onFavoritesBtnClick);

@@ -1,7 +1,8 @@
 "use strict";
 
-import { productsData, productsCopyArr } from './data.js'
+import { productsData } from './data.js'
 import { renderCatalogList } from './render-cards.js'
+import { productsCopyArr } from './filters.js'
 
 export const sortPriceBtn = document.getElementById("sort-cheap");
 export const sortPopularBtn = document.getElementById("sort-popular");
@@ -30,18 +31,15 @@ const sortProductDate = (firstElement, SecondElement) => {
 };
 
 const onSortPriceBtnClick = () => {
-  productsCopyArr.sort(sortProductPrice);
-  renderCatalogList();
+  renderCatalogList(productsCopyArr.sort(sortProductPrice));
 };
 
 const onSortDateBtnClick = () => {
-  productsCopyArr.sort(sortProductDate).reverse();
-  renderCatalogList();
+  renderCatalogList(productsCopyArr.sort(sortProductDate).reverse());
 };
 
 const onSortPopularBtnClick = () => {
-  productsCopyArr = productsData.slice();
-  renderCatalogList();
+  renderCatalogList(productsData.slice());
 };
 
 sortPriceBtn.addEventListener('click',onSortPriceBtnClick); 

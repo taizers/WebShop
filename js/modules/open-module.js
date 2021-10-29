@@ -1,10 +1,28 @@
 "use strict";
 
 import { productsData } from './data.js'
+import { fillHTMLTemplates, clearHTMLItem } from './render.js'
 
 export const CURRENCY = "₽";
 const ONE_DAY_IN_MS = 86400000;
 const TWO_DAYS_IN_MS = 172800000;
+
+const months = [
+  'января',
+  'февраля',
+  'марта',
+  'апреля',
+  'мая',
+  'июня',
+  'июля',
+  'августа',
+  'сентября',
+  'октября',
+  'ноября',
+  'декабря'
+];
+
+const modal = document.querySelector(".popup");
 
 const renderPhotos = (photos, name) => {
     let images = "";
@@ -216,7 +234,7 @@ const onModalOutLineClick = (evt) =>{
 
 const synhCardAndModal = (id) => {
     const card = document.getElementById(id).querySelector(".product__favourite");
-    card.classList.contains("fav-add--checked") ? card.classList.remove("fav-add--checked") :card.classList.add("fav-add--checked");
+    card.classList.contains("fav-add--checked") ? card.classList.remove("fav-add--checked") : card.classList.add("fav-add--checked");
   
 };
   
