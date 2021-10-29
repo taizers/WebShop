@@ -184,10 +184,36 @@ productsData.forEach(element => {
   console.log(element);
 });
 
+localStorage.clear();
+
+const getproductsDataStorage = () => {
+  return JSON.parse(localStorage.getItem('cards'));
+};
+
+const setproductsDataStorage = (cards) => {
+  localStorage.setItem('cards', JSON.stringify(cards));
+  return false;
+};
+
+const getCardContentData = (list, id) => {
+  for (let item of list) {
+    if (item.card_id === id) {
+      return item;
+    }
+  }
+}
+const getCardContentData1 = (list, id) => {
+  list.forEach(item => {
+    if (item.card_id === id) {
+      return item;
+    }
+  });
+}
+
 const productCard = (productData) =>{ 
   const textTeg = `
   <li class="results__item product" id = "${productData.card_id}">
-    <button class="product__favourite fav-add" type="button" aria-label="Добавить в избранное">
+    <button class="product__favourite fav-add ${(getproductsDataStorage() != null && getCardContentData(getproductsDataStorage(),productData.card_id) != null) ? "fav-add--checked" : ""} " type="button" aria-label="Добавить в избранное">
       <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path fill-rule="evenodd" clip-rule="evenodd" d="M3 7C3 13 10 16.5 11 17C12 16.5 19 13 19 7C19 4.79086 17.2091 3 15 3C12 3 11 5 11 5C11 5 10 3 7 3C4.79086 3 3 4.79086 3 7Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
       </svg>
@@ -210,7 +236,7 @@ const productCard = (productData) =>{
 
 const productEventCard = (productData) =>{ 
   const textTeg = `
-  <div class="popup__inner">
+  <div class="popup__inner  ">
     <button class="popup__close" type="button" aria-label="Закрыть">
       <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
         <path fill-rule="evenodd" clip-rule="evenodd" d="M0.292893 0.292893C0.683418 -0.0976311 1.31658 -0.0976311 1.70711 0.292893L8 6.58579L14.2929 0.292893C14.6834 -0.0976311 15.3166 -0.0976311 15.7071 0.292893C16.0976 0.683418 16.0976 1.31658 15.7071 1.70711L9.41421 8L15.7071 14.2929C16.0976 14.6834 16.0976 15.3166 15.7071 15.7071C15.3166 16.0976 14.6834 16.0976 14.2929 15.7071L8 9.41421L1.70711 15.7071C1.31658 16.0976 0.683418 16.0976 0.292893 15.7071C-0.0976311 15.3166 -0.0976311 14.6834 0.292893 14.2929L6.58579 8L0.292893 1.70711C-0.0976311 1.31658 -0.0976311 0.683418 0.292893 0.292893Z"/>
@@ -222,7 +248,7 @@ const productEventCard = (productData) =>{
     <div class="popup__columns">
       <div class="popup__left">
         <div class="popup__gallery gallery">
-          <button class="gallery__favourite fav-add">
+          <button id= "${productData.card_id + "p"}" class="gallery__favourite fav-add ${(getproductsDataStorage() != null && getCardContentData(getproductsDataStorage(),productData.card_id) != null) ? "fav-add--checked" : ""}">
             <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path fill-rule="evenodd" clip-rule="evenodd" d="M3 7C3 13 10 16.5 11 17C12 16.5 19 13 19 7C19 4.79086 17.2091 3 15 3C12 3 11 5 11 5C11 5 10 3 7 3C4.79086 3 3 4.79086 3 7Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
             </svg>
@@ -283,11 +309,13 @@ const productEventCard = (productData) =>{
 
 let productsCopyArr = productsData.slice();
 const catalogList = document.querySelector('.results__list');
-const sortPriceBtn = document.querySelector(".sorting__price");
-const sortPopularBtn = document.querySelector(".sorting__popular");
-const sortDateBtn = document.querySelector(".sorting__date");
+
 
 //////////////////////              SORT                    //////////////////////////////////
+const sortPriceBtn = document.getElementById("sort-cheap");
+const sortPopularBtn = document.getElementById("sort-popular");
+const sortDateBtn = document.getElementById("sort-new");
+
 
 const sortProductPrice = (firstElement, SecondElement) => {
   const firstElementSort = firstElement.price;
@@ -303,13 +331,11 @@ const sortProductDate = (firstElement, SecondElement) => {
 };
 
 const onSortPriceBtnClick = () => {
-  productsCopyArr = productsData.slice();
   productsCopyArr.sort(sortProductPrice);
   renderCatalogList();
 };
 
 const onSortDateBtnClick = () => {
-  productsCopyArr = productsData.slice();
   productsCopyArr.sort(sortProductDate).reverse();
   renderCatalogList();
 };
@@ -323,12 +349,8 @@ const onSortPopularBtnClick = () => {
 
 const modal = document.querySelector(".popup");
 
-const getCardContentData = (list, id) => {
-  for (let item of list) {
-    if (item.card_id === id) {
-      return item;
-    }
-  }
+const clearHTMLItem = (item) => {
+  item.innerHTML = "";
 }
 
 const renderPhotos = (photos, name) => {
@@ -354,14 +376,6 @@ const addSwapOnGalery = (evt) =>{
   galeryMainImage.firstElementChild.src = evt.target.src;
 };
 
-const renderModalItemData = (index) =>{
-  const fragment = document.createDocumentFragment();
-  fragment.appendChild(getTeg(productEventCard(productsCopyArr[index])));
-
-  modal.innerHTML = '';
-  modal.appendChild(fragment);
-};
-
 const findCloseButton = () => {
   const modalCloseBtn = modal.querySelector(".popup__close");
   return modalCloseBtn;
@@ -370,6 +384,10 @@ const findCloseButton = () => {
 const findGaleryImages = () => {
   const galeryImages = modal.querySelectorAll(".gallery__item");
   return galeryImages;
+};
+
+const findGaleryImageFavorite = () => {
+  return  modal.querySelector(".gallery__favourite");
 };
 
 const openModal = () => {
@@ -381,13 +399,14 @@ const closeModal = () => {
 };
 
 const onCloseBtnClick = () => {
-  removeModalListeners(findCloseButton());
+  removeModalListeners(findCloseButton(), findGaleryImageFavorite());
   closeModal();
 };
 
-const onShowClick = (index) => {
-  renderModalItemData(index);
-  initModalListeners(findCloseButton());
+const onShowModalClick = (cardData) => {
+  clearHTMLItem(modal);
+  fillHTMLTemplates(modal, productEventCard(cardData))
+  initModalListeners(findCloseButton(), findGaleryImageFavorite());
   openModal();
 };
 
@@ -421,95 +440,81 @@ const onModalOutLineClick = (evt) =>{
   }
 };
 
-const addListenersToCards = () =>{
-  const productImages = document.querySelectorAll(".product__image");
-  const productTitles = document.querySelectorAll(".product__title");
 
-/*
-  productTitles.forEach((element, index) => {
-    element.addEventListener('click', onShowClick(index));
-  });
-  productImages.forEach((element, index) => {
-    element.addEventListener('click', onShowClick(index));
-  });
-*/
-  for (let index = 0; index < productTitles.length; index++) {
-    productTitles[index].addEventListener('click', (evt) => {
-      onShowClick(index);
-    })
-    productImages[index].addEventListener('click', (evt) => {
-      onShowClick(index);
-    })
-  }
-  /*
-  for (let index = 0; index < productTitles.length; index++) {
-    productTitles[index].addEventListener('click', onShowClick(index));
-    productImages[index].addEventListener('click', onShowClick(index));
-  }*/
-};
 
-localStorage.clear();
-
-const getproductsDataStorage = () => {
-  return JSON.parse(localStorage.getItem('cards'));
-};
-
-const setproductsDataStorage = (cards) => {
-  localStorage.setItem('cards', JSON.stringify(cards));
-  return false;
-}
-
-const onFavoritesClick = (evt) => {
-  this.disabled = true;
-  console.log("+");
+const onFavoritesClick = (cardData,elem) => {
   const productsDataStorage = getproductsDataStorage() || [];
   
-  if (productsDataStorage.includes(productsData[index])) {
-    evt.currentTarget.classList.remove("fav-add--checked");
-    productsDataStorage.splice(productsDataStorage.indexOf(productsData[index]), 1);
+  if ((productsDataStorage != null && getCardContentData(productsDataStorage,cardData.card_id) != null)) {
+    elem.classList.remove("fav-add--checked");
+    productsDataStorage.splice(productsDataStorage.indexOf(cardData), 1);
   }else{
-    evt.currentTarget.classList.add("fav-add--checked");
-    productsDataStorage.push(productsData[index]);
+    console.log(elem);
+    elem.classList.add("fav-add--checked");
+    productsDataStorage.push(cardData);
   }
 
-  if(!setproductsDataStorage(productsDataStorage)){ 
-    this.disabled = false; 
-  }
-  console.log(productsDataStorage);
-  //return false;
-
+  setproductsDataStorage(productsDataStorage)
 }
 
 const findFavoriteAddBtns = () => {
   return document.querySelectorAll(".product__favourite");
 };
 
-const removeFavorites = () => {
-  findFavoriteAddBtns().forEach((element, index) => {
-    element.removeEventListener('click', onFavoritesClick);
-  });
+const fillHTMLTemplates = (wrapper, template) => {
+  const fragment = document.createDocumentFragment();
+  fragment.appendChild(getTeg(template));
+  wrapper.appendChild(fragment);
+}
+
+const onCardClick = (evt) => {
+  if (evt.target === evt.currentTarget.querySelector('img') || evt.target === evt.currentTarget.querySelector('a')) {
+    evt.preventDefault();
+    onShowModalClick(getCardContentData(productsData.slice(), evt.currentTarget.id));
+  }
+  console.log(evt.target + "    1");
+  console.log(evt.currentTarget.querySelector(".product__favourite") + "    2");
+  if (evt.target == evt.currentTarget.querySelector(".product__favourite")) {
+    onFavoritesClick(getCardContentData(productsData.slice(), evt.currentTarget.id),evt.currentTarget.querySelector(".product__favourite"));
+  }
+}
+const syncpCardAndModal = (id) => {
+  const card = document.getElementById(id).querySelector(".product__favourite");
+  card.classList.contains("fav-add--checked") ? card.classList.remove("fav-add--checked") :card.classList.add("fav-add--checked");
+
 };
 
-const addFavorites = () => {
-  console.log("---------------------------");
-  findFavoriteAddBtns().forEach((element, index) => {
-    element.addEventListener('click', onFavoritesClick);
+const onModalFavoriteClick = (evt) => {
+  console.log(evt.target + "    2-1");
+  console.log(evt.currentTarget + "    2-2");
+  if (evt.target == evt.currentTarget) {
+    onFavoritesClick(getCardContentData(productsData.slice(), evt.currentTarget.id.slice(0, -1)),evt.currentTarget);
+    syncpCardAndModal(evt.currentTarget.id.slice(0, -1));
+  }
+};
+
+const removeEventListenerCards = (cardsItems) => {
+  cardsItems.forEach((card) => {
+    card.removeEventListener('click', onCardClick)
+  });
+}
+
+const addEventListenerCards = (cardsItems) =>{
+  cardsItems.forEach((card) => {
+    card.addEventListener('click', onCardClick)
   });
 };
 
 const renderCatalogList = () => {
-  removeFavorites();
-  const fragment = document.createDocumentFragment();
+  removeEventListenerCards(catalogList.querySelectorAll('.results__item'));
+
+  clearHTMLItem(catalogList);
 
   productsCopyArr.slice(0, MAX_VIEW_PRODUCT_COUNT).forEach((it) => {
-    fragment.appendChild(getTeg(productCard(it)));
+    fillHTMLTemplates(catalogList,productCard(it));
   });
-  catalogList.innerHTML = '';
-  catalogList.appendChild(fragment);
-  addListenersToCards();
-  
-  addFavorites();
- 
+
+  addEventListenerCards(catalogList.querySelectorAll('.results__item'));
 };
 
 renderCatalogList();
@@ -518,7 +523,8 @@ sortPriceBtn.addEventListener('click',onSortPriceBtnClick);
 sortDateBtn.addEventListener('click',onSortDateBtnClick); 
 sortPopularBtn.addEventListener('click',onSortPopularBtnClick); 
 
-const initModalListeners = (modalCloseBtn) => {  
+const initModalListeners = (modalCloseBtn, favoriteBtn) => {  
+  favoriteBtn.addEventListener("click",onModalFavoriteClick);
   findGaleryImages().forEach(item => {
     item.addEventListener('click', addSwapOnGalery)
   });
@@ -527,7 +533,8 @@ const initModalListeners = (modalCloseBtn) => {
   document.addEventListener('keydown',onModalKeyDown); 
   window.addEventListener("click",onModalOutLineClick);
 };
-const removeModalListeners = (modalCloseBtn) => {
+const removeModalListeners = (modalCloseBtn, favoriteBtn) => {
+  favoriteBtn.removeEventListener("click",onModalFavoriteClick);
   findGaleryImages().forEach(item => {
     item.removeEventListener('click', addSwapOnGalery)
   });
@@ -548,7 +555,7 @@ const filterMinArea = document.getElementById("square");
 const minPrice = 0;
 const maxPrice = 2000000;
 
-const getFilterRoomsResult = () =>{
+/* const getFilterRoomsResult = () =>{
   let count = 0;
   filterRoomsCount.forEach(element => {
       if (element.checked) {
@@ -653,7 +660,7 @@ const onFilterBtnClick = (evt) => {
 
 };
 
-filterBtn.addEventListener("click", onFilterBtnClick);
+filterBtn.addEventListener("click", onFilterBtnClick); */
 
 ////////////////////////////////////////  FILTERS END   //////////////////////////////////////
 
@@ -661,15 +668,37 @@ filterBtn.addEventListener("click", onFilterBtnClick);
 
 const sortingFavoritesBtn = document.querySelector(".sorting__favourites");
 
+const notFound = `<p style="text-align:center">«У вас пока нет избранных товаров. Чтобы
+отметить товар, кликните на сердечко в карточке объявления. Вы можете
+вернуться к списку всех товаров, кликнув ещё раз на «Показать
+избранные»</p>`;
+
 const onFavoritesBtnClick = () => {
-  const productsDataStorage = getproductsDataStorage();
-  if (productsDataStorage != null) {
-    productsCopyArr = productsDataStorage;
+   
+  if (!document.getElementById("favourites").checked) {
+    productsCopyArr = productsData.slice();
     renderCatalogList();
+    sortPriceBtn.disabled = false;
+    sortPopularBtn.disabled = false;
+    sortDateBtn.disabled = false;
+    filterBtn.disabled = false;
   }
   else{
-
+    const productsDataStorage = getproductsDataStorage();
+    sortPriceBtn.disabled = true;
+    sortPopularBtn.disabled = true;
+    sortDateBtn.disabled = true;
+    filterBtn.disabled = true;
+    if (productsDataStorage != null) {
+      productsCopyArr = productsDataStorage;
+      renderCatalogList();
+    }
+    else{
+      clearHTMLItem(catalogList);
+      fillHTMLTemplates(catalogList,notFound);
+    }
   }
+
 };
 
 sortingFavoritesBtn.addEventListener("click", onFavoritesBtnClick);
