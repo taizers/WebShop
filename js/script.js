@@ -632,6 +632,9 @@ const getElementsOnCountRooms = (elements, filterRoomsValue) => {
   return arr;
 };
 
+const notFoundFilters = `<p style="text-align:center">Мы не нашли товары по вашему запросу. Попробуйте поменять
+фильтры настройки объявлений в блоке слева</p>`;
+
 const onFilterFormSubmit = (evt) => {
   evt.preventDefault();
   let productsFilterArr = productsData.slice(0, MAX_VIEW_PRODUCT_COUNT);
@@ -648,9 +651,14 @@ const onFilterFormSubmit = (evt) => {
   if (filterFormData.has("rooms")) {
     productsFilterArr = getElementsOnCountRooms(productsFilterArr,getFilterRoomsResult(filterFormData.get("rooms")));
   }
-  console.log(Array.from(filterFormData));
-  productsCopyArr = productsFilterArr;
-  renderCatalogList();
+  if (productsFilterArr.length != 0) {
+    productsCopyArr = productsFilterArr;
+    renderCatalogList();
+  }else{
+    clearHTMLItem(catalogList);
+    fillHTMLTemplates(catalogList,notFoundFilters);
+  }
+
 };
 
 filterForm.addEventListener("submit", onFilterFormSubmit);
@@ -758,14 +766,26 @@ const onFavoritesBtnClick = () => {
     sortPriceBtn.disabled = false;
     sortPopularBtn.disabled = false;
     sortDateBtn.disabled = false;
-    filterBtn.disabled = false;
+    document.getElementById("square").disabled = false;
+    filterForm.childNodes.forEach(element => {
+      element.disabled = false;
+      element.childNodes.forEach(elementChild => {
+        elementChild.disabled = false;
+      });
+    });
   }
   else{
     const productsDataStorage = getproductsDataStorage();
     sortPriceBtn.disabled = true;
     sortPopularBtn.disabled = true;
     sortDateBtn.disabled = true;
-    filterBtn.disabled = true;
+    document.getElementById("square").disabled = true;
+    filterForm.childNodes.forEach(element => {
+      element.disabled = true;
+      element.childNodes.forEach(elementChild => {
+        elementChild.disabled = true;
+      });
+    });
     if (productsDataStorage != null) {
       productsCopyArr = productsDataStorage;
       renderCatalogList();
