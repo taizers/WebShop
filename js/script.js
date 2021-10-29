@@ -477,7 +477,8 @@ const onCardClick = (evt) => {
   if (evt.target == evt.currentTarget.querySelector(".product__favourite")) {
     onFavoritesClick(getCardContentData(productsData.slice(), evt.currentTarget.id),evt.currentTarget.querySelector(".product__favourite"));
   }
-}
+};
+
 const syncpCardAndModal = (id) => {
   const card = document.getElementById(id).querySelector(".product__favourite");
   card.classList.contains("fav-add--checked") ? card.classList.remove("fav-add--checked") :card.classList.add("fav-add--checked");
@@ -546,40 +547,116 @@ const removeModalListeners = (modalCloseBtn, favoriteBtn) => {
 
 ////////////////////////////////////////  FILTERS   //////////////////////////////////////
 
-const filterBtn = document.querySelector(".filter__button");
-
-const filterRoomsCount = document.getElementsByName("rooms");
-const filtertypesBuild = document.getElementsByName("estate-type");
-const filterMinArea = document.getElementById("square");
+const filterForm = document.querySelector(".filter").querySelector("form"); 
 
 const minPrice = 0;
 const maxPrice = 2000000;
 
-/* const getFilterRoomsResult = () =>{
+const getFilterRoomsResult = (value) =>{
   let count = 0;
-  filterRoomsCount.forEach(element => {
-      if (element.checked) {
-        switch (element.value) {
-          case "one":
-            count = 1;
-            break;
-          case "two":
-            count = 2;
-            break;
-          case "three":
-            count = 3;
-            break;
-          case "four":
-            count = 4;
-            break;
-          case "fivemore":
-            count = 5;
-            break;
-        }
-      }
-  });
+  switch (value) {
+    case "one":
+      count = 1;
+      break;
+    case "two":
+      count = 2;
+      break;
+    case "three":
+      count = 3;
+      break;
+    case "four":
+      count = 4;
+      break;
+    case "fivemore":
+      count = 5;
+      break;
+    default:
+      count = 0;
+      break;
+  }
+  console.log(count);
   return count;
 };
+
+const getTypes = (filterFormData) => {
+  let typesArr = [];
+  for (let [name, value] of filterFormData) {
+    if (name === "estate-type") {
+      typesArr.push(value);
+    }
+  }
+  return typesArr;
+};
+
+const getElementsOnType = (elements, filterFormData) => {
+  let arr = [];
+  const typesArr = getTypes(filterFormData);
+  elements.forEach(element => {
+    if (typesArr.includes(element.filters.type)) {
+      arr.push(element);
+    }
+  });
+  return arr;
+};
+
+const getElementsOnMinArea = (elements, minArea) =>{
+  let arr = [];
+  elements.forEach(element => {
+    if (element.filters.area > minArea) {
+      arr.push(element);
+    }
+  });
+  return arr;
+};
+
+const getElementsOnCountRooms = (elements, filterRoomsValue) => {
+  let arr = [];
+  if (filterRoomsValue === 0) {
+    arr = elements;
+  }else{
+    if (filterRoomsValue != 5) {
+      elements.forEach(element => {
+        if (element.filters.roomsCount === filterRoomsValue) {
+          arr.push(element);
+        }
+      });
+    }
+    else{
+      elements.forEach(element => {
+        if (element.filters.roomsCount >= filterRoomsValue) {
+          arr.push(element);
+        }
+      });
+    }
+  }
+  return arr;
+};
+
+const onFilterFormSubmit = (evt) => {
+  evt.preventDefault();
+  let productsFilterArr = productsData.slice(0, MAX_VIEW_PRODUCT_COUNT);
+  const filterFormData = new FormData(filterForm);
+  if (filterFormData.has("sampleSlider")) {
+    //filterFormData.get("sampleSlider");
+  }
+  if (filterFormData.has("estate-type")) {
+    productsFilterArr = getElementsOnType(productsFilterArr, filterFormData);
+  }
+  if (filterFormData.has("min-square") && filterFormData.get("min-square") != "") {
+    productsFilterArr = getElementsOnMinArea(productsFilterArr, filterFormData.get("min-square"));
+  }
+  if (filterFormData.has("rooms")) {
+    productsFilterArr = getElementsOnCountRooms(productsFilterArr,getFilterRoomsResult(filterFormData.get("rooms")));
+  }
+  console.log(Array.from(filterFormData));
+  productsCopyArr = productsFilterArr;
+  renderCatalogList();
+};
+
+filterForm.addEventListener("submit", onFilterFormSubmit);
+
+
+/* 
 
 const getElementsOnPrice = (min, max, elements) => {
   let arr =[];
