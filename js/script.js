@@ -110,12 +110,6 @@ const months = [
   'декабря'
 ];
 
-const getTeg = (textTeg) =>{
-  const d = document.createElement('div');
-  d.insertAdjacentHTML("beforeEnd", textTeg);
-  return d.firstElementChild;
-}
-
 const productsData = [];
 
 const getNumbersDate = () =>{
@@ -124,18 +118,7 @@ const getNumbersDate = () =>{
   return date - randomDate;
 }
 
-const getProductsDate = (productDate) => {
-  const date = Date.now();
-  if (productDate <= date && productDate > date - ONE_DAY_IN_MS) {
-    return "Сегодня";
-  } else
-  if (productDate <= date - ONE_DAY_IN_MS && productDate > date - TWO_DAYS_IN_MS) {
-    return "Вчера";
-  }else
-  {
-    return `${new Date(productDate).getDay() + 1} ${months[new Date(productDate).getMonth()]} ${new Date(productDate).getFullYear()} года`;
-  }
-}
+
 
 const getPhotos = () => {
   const photos = [];
@@ -147,10 +130,6 @@ const getPhotos = () => {
     photos.push(photoFileName);
   }
   return photos;
-}
-
-const numberWithSpaces = (x) => {
-  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
 
 for (let index = 0; index < MAX_VIEW_PRODUCT_COUNT; index++) {
@@ -185,6 +164,30 @@ productsData.forEach(element => {
 });
 
 localStorage.clear();
+
+const getProductsDate = (productDate) => {
+  const date = Date.now();
+  if (productDate <= date && productDate > date - ONE_DAY_IN_MS) {
+    return "Сегодня";
+  } else
+  if (productDate <= date - ONE_DAY_IN_MS && productDate > date - TWO_DAYS_IN_MS) {
+    return "Вчера";
+  }else
+  {
+    return `${new Date(productDate).getDay() + 1} ${months[new Date(productDate).getMonth()]} ${new Date(productDate).getFullYear()} года`;
+  }
+}
+
+const getTeg = (textTeg) =>{
+  const d = document.createElement('div');
+  d.insertAdjacentHTML("beforeEnd", textTeg);
+  return d.firstElementChild;
+}
+
+
+const numberWithSpaces = (x) => {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
 
 const getproductsDataStorage = () => {
   return JSON.parse(localStorage.getItem('cards'));
@@ -662,90 +665,6 @@ const onFilterFormSubmit = (evt) => {
 };
 
 filterForm.addEventListener("submit", onFilterFormSubmit);
-
-
-/* 
-
-const getElementsOnPrice = (min, max, elements) => {
-  let arr =[];
-  elements.forEach(element => {
-    if (element.price > min && element.price < max) {
-      arr.push(element);
-    }
-  });
-  return arr;
-};
-
-const getTypes = (filtertypes) => {
-  let arr = [];
-  filtertypes.forEach(element => {
-    if (element.checked) {
-      arr.push(element.value);
-    } 
-  });
-  return arr;
-};
-
-const getElementsOnType = (elements) => {
-  let arr = [];
-  const typesArr = getTypes(filtertypesBuild);
-  elements.forEach(element => {
-    if (typesArr.includes(element.filters.type)) {
-      arr.push(element);
-    }
-  });
-  return arr;
-};
-
-const getElementsOnMinArea = (elements) =>{
-  let arr = [];
-  elements.forEach(element => {
-    if (element.filters.area > filterMinArea.value) {
-      arr.push(element);
-    }
-  });
-  return arr;
-};
-
-const getElementsOnCountRooms = (elements) => {
-  let arr = [];
-  const filterRooms = getFilterRoomsResult();
-  if (filterRooms != 5) {
-    elements.forEach(element => {
-      if (element.filters.roomsCount === filterRooms) {
-        arr.push(element);
-      }
-    });
-  }
-  else{
-    elements.forEach(element => {
-      if (element.filters.roomsCount >= filterRooms) {
-        arr.push(element);
-      }
-    });
-  }
-  return arr;
-};
-
-const onFilterBtnClick = (evt) => {
-  evt.preventDefault();
-  let productsFilterArr = productsData.slice(0, MAX_VIEW_PRODUCT_COUNT);
-  productsFilterArr = getElementsOnPrice(minPrice, maxPrice, productsFilterArr);
-  if (getTypes(filtertypesBuild).length != 0) {
-    productsFilterArr = getElementsOnType(productsFilterArr);
-  }
-  if (filterMinArea.value != "") {
-    productsFilterArr = getElementsOnMinArea(productsFilterArr);
-  }
-  if (getFilterRoomsResult() != "") {
-    productsFilterArr = getElementsOnCountRooms(productsFilterArr);
-  }
-  productsCopyArr = productsFilterArr;
-  renderCatalogList();
-
-};
-
-filterBtn.addEventListener("click", onFilterBtnClick); */
 
 ////////////////////////////////////////  FILTERS END   //////////////////////////////////////
 
