@@ -31,11 +31,23 @@ const sortProductDate = (firstElement, SecondElement) => {
 
 export const onSortClick = (productsCopy, setFavoritStatus) => {
   const onSortPriceBtnClick = () => {
-    renderCatalogList(productsCopyArr.sort(sortProductPrice), setFavoritStatus);
+    let arr = [];
+    if (productsCopyArr.length != 0) {
+      arr = productsCopyArr;
+    }else{
+      arr = productsCopy;
+    }
+    renderCatalogList(arr.sort(sortProductPrice), setFavoritStatus);
   };
   
   const onSortDateBtnClick = () => {
-    renderCatalogList(productsCopyArr.sort(sortProductDate).reverse(),setFavoritStatus);
+    let arr = [];
+    if (productsCopyArr.length != 0) {
+      arr = productsCopyArr;
+    }else{
+      arr = productsCopy;
+    }
+    renderCatalogList(arr.sort(sortProductDate).reverse(),setFavoritStatus);
   };
   
   const onSortPopularBtnClick = () => {
