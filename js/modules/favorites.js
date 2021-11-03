@@ -4,6 +4,7 @@ import { sortDateBtn, sortPriceBtn, sortPopularBtn } from './sort.js';
 import { filterForm} from './filters.js';
 import { renderCatalogList,catalogList } from './render-cards.js';
 import { getproductsDataStorage } from './open-modal.js';
+import { fillHTMLTemplates, clearHTMLItem } from './render.js';
 
 const notFound = `<p style="text-align:center">«У вас пока нет избранных товаров. Чтобы
 отметить товар, кликните на сердечко в карточке объявления. Вы можете
@@ -45,7 +46,7 @@ export const setFavorite = (cardsData, setFavoritStatus) =>{
     const productsDataStorage = getproductsDataStorage();
     turningOnSortElements();
     
-    if (productsDataStorage != "" && productsDataStorage.length != 0) {
+    if (productsDataStorage != null) {
       renderCatalogList(productsDataStorage, setFavoritStatus);
     }
     else{

@@ -1,7 +1,7 @@
 "use strict";
 
-import { onShowModalClick,  getCardContentData, getProductsDate, numberWithSpaces, CURRENCY } from './open-modal.js'
-import { fillHTMLTemplates, clearHTMLItem } from './render.js'
+import { onShowModalClick,  getCardContentData, getProductsDate, numberWithSpaces, CURRENCY } from './open-modal.js';
+import { fillHTMLTemplates, clearHTMLItem } from './render.js';
 
 export const catalogList = document.querySelector('.results__list');
 

@@ -17,7 +17,6 @@ const onError = (errorMessage) => {
     console.log(errorMessage);
 };
 
-
 const onLoad = (data) => {
     localStorage.clear();
     cardsData = adapter(data.products);
@@ -36,16 +35,15 @@ const onLoad = (data) => {
     renderCatalogList(cardsData.slice(0, MAX_VIEW_PRODUCT_COUNT), setFavoritStatus);
 
     const onFavoritesBtnClick = () => {
-        console.log("сработал fav");
         setFavorite(cardsData.slice(0, MAX_VIEW_PRODUCT_COUNT), setFavoritStatus);
     };
 
     const onFilterFormSubmit = (evt) => {
         evt.preventDefault();
-        selectFiltersOnProducts(cardsData, setFavoritStatus);
+        selectFiltersOnProducts(cardsData.slice(0, MAX_VIEW_PRODUCT_COUNT), setFavoritStatus);
     };
 
-    onSortClick(cardsData, setFavoritStatus);
+    onSortClick(cardsData.slice(0, MAX_VIEW_PRODUCT_COUNT), setFavoritStatus);
 
     document.querySelector(".sorting__favourites").addEventListener("click", onFavoritesBtnClick);      
     document.querySelector(".filter").querySelector("form").addEventListener("submit", onFilterFormSubmit);
