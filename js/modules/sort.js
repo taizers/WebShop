@@ -1,8 +1,7 @@
 "use strict";
 
-import { productsData } from './data.js'
 import { renderCatalogList } from './render-cards.js'
-import { productsCopyArr } from './filters.js'
+//import { productsCopyArr } from './filters.js'
 
 export const sortPriceBtn = document.getElementById("sort-cheap");
 export const sortPopularBtn = document.getElementById("sort-popular");
@@ -30,7 +29,25 @@ const sortProductDate = (firstElement, SecondElement) => {
   return firstElementSort-SecondElementSort;
 };
 
-const onSortPriceBtnClick = () => {
+export const onSortClick = (productsCopyArr, setFavoritStatus) => {
+  const onSortPriceBtnClick = () => {
+    renderCatalogList(productsCopyArr.sort(sortProductPrice), setFavoritStatus);
+  };
+  
+  const onSortDateBtnClick = () => {
+    renderCatalogList(productsCopyArr.sort(sortProductDate).reverse(),setFavoritStatus);
+  };
+  
+  const onSortPopularBtnClick = () => {
+    renderCatalogList(productsCopyArr, setFavoritStatus);//тут заменил
+  };
+  
+  sortPriceBtn.addEventListener('click',onSortPriceBtnClick); 
+  sortDateBtn.addEventListener('click',onSortDateBtnClick); 
+  sortPopularBtn.addEventListener('click',onSortPopularBtnClick); 
+};
+
+/* const onSortPriceBtnClick = () => {
   renderCatalogList(productsCopyArr.sort(sortProductPrice));
 };
 
@@ -39,9 +56,10 @@ const onSortDateBtnClick = () => {
 };
 
 const onSortPopularBtnClick = () => {
-  renderCatalogList(productsData.slice());
+  console.log(productsCopyArr);
+  renderCatalogList(productsCopyArr);//тут заменил
 };
 
 sortPriceBtn.addEventListener('click',onSortPriceBtnClick); 
 sortDateBtn.addEventListener('click',onSortDateBtnClick); 
-sortPopularBtn.addEventListener('click',onSortPopularBtnClick); 
+sortPopularBtn.addEventListener('click',onSortPopularBtnClick);  */
