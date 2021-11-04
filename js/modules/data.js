@@ -2,8 +2,8 @@
 
 import './rSlider.min.js';
 
-const MIN_PRICE = 250000;
-const MAX_PRICE = 2000000;
+const MIN_PRICE = 1000000;
+const MAX_PRICE = 40000000;
 const DEBOUNCE_INTERVAL = 500;
 
 const getSliderValues = () => {
@@ -27,6 +27,7 @@ const mySlider = new rSlider({
 
 export const adapter = (cards) => {
     const cardsList = [];
+
     cards.forEach((card, index) => {
         cardsList.push({
             card_id: `card_${index}`,
@@ -59,9 +60,15 @@ export const adapter = (cards) => {
 
 let lastTimeout; 
 
-export const debounce = (fn) => {
-  if (lastTimeout) {
-    clearTimeout(lastTimeout);
-  }
-  lastTimeout = setTimeout(fn,DEBOUNCE_INTERVAL);
+export function debounce(fn) {
+    let isCooldown = false;
+    return function() {
+        if (isCooldown) return;
+
+        fn.apply(this, arguments);
+
+        isCooldown = true;
+
+        setTimeout(() => isCooldown = false, DEBOUNCE_INTERVAL);
+    };
 };

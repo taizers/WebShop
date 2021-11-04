@@ -2,14 +2,17 @@
 
 import { sortDateBtn, sortPriceBtn, sortPopularBtn } from './sort.js';
 import { filterForm} from './filters.js';
-import { renderCatalogList,catalogList } from './render-cards.js';
-import { getproductsDataStorage } from './open-modal.js';
-import { fillHTMLTemplates, clearHTMLItem } from './render.js';
+import { renderCatalogList, catalogList, getCardContentData } from './render-cards.js';
+import { renderElement, clearHTMLItem } from './render.js';
+import { debounce } from './data.js';
+
+let favoriteData = [];
+const favoriteBtn = document.querySelector(".sorting__favourites");
 
 const notFound = `<p style="text-align:center">«У вас пока нет избранных товаров. Чтобы
-отметить товар, кликните на сердечко в карточке объявления. Вы можете
-вернуться к списку всех товаров, кликнув ещё раз на «Показать
-избранные»</p>`; 
+  отметить товар, кликните на сердечко в карточке объявления. Вы можете
+  вернуться к списку всех товаров, кликнув ещё раз на «Показать
+  избранные»</p>`; 
 
 const disableSortElements = () =>{
   sortPriceBtn.disabled = false;
@@ -37,21 +40,80 @@ const turningOnSortElements = () =>{
   });
 };
 
-export const setFavorite = (cardsData, setFavoritStatus) =>{
+const setproductsDataStorage = (cards) => {
+  localStorage.setItem('cards', JSON.stringify(cards));
+};
+
+const getproductsDataStorage = () => {
+  return JSON.parse(localStorage.getItem('cards'));
+};
+
+const onFavoritesRemove = (cardData, elem) => {
+  const productsDataStorage = getproductsDataStorage() || [];
+  
+  if ((productsDataStorage != null && getCardContentData(productsDataStorage, cardData.card_id) != null)) {
+    elem.classList.remove("fav-add--checked");
+    productsDataStorage.splice(productsDataStorage.indexOf(cardData), 1);
+  }
+
+  setproductsDataStorage(productsDataStorage)
+};
+
+const onFavoritesAdd = (cardData, elem) => {
+  const productsDataStorage = getproductsDataStorage() || [];
+  
+  if ( !((productsDataStorage != null && getCardContentData(productsDataStorage, cardData.card_id) != null)) ) {
+    elem.classList.add("fav-add--checked");
+    productsDataStorage.push(cardData);
+  }
+
+  setproductsDataStorage(productsDataStorage)
+};
+
+const toggleFavorite = (cardDataItem) =>{
+  cardDataItem.favorite = !cardDataItem.favorite;
+};
+
+export const setFavoriteStatus = (cardDataItem, elemetTarget) => {
+  if (cardDataItem.favorite) {
+    toggleFavorite(cardDataItem);
+    onFavoritesRemove(cardDataItem, elemetTarget);
+  }else{
+    toggleFavorite(cardDataItem);
+    onFavoritesAdd(cardDataItem, elemetTarget);
+  }
+};
+
+const toggleFavoriteView = () =>{
+  let favoriteDataCopy = favoriteData;
   if (!document.getElementById("favourites").checked) {
-    renderCatalogList(cardsData, setFavoritStatus);
+    document.querySelector('#sort-popular').checked = true;
+    renderCatalogList(favoriteDataCopy);
     disableSortElements();
   }
   else{
-    const productsDataStorage = getproductsDataStorage();
+    favoriteDataCopy = getproductsDataStorage();
     turningOnSortElements();
     
-    if (productsDataStorage != null) {
-      renderCatalogList(productsDataStorage, setFavoritStatus);
+    if (favoriteDataCopy != null) {
+      renderCatalogList(favoriteDataCopy);
     }
     else{
       clearHTMLItem(catalogList);
-      fillHTMLTemplates(catalogList,notFound);
+     catalogList.insertAdjacentElement("beforeEnd", renderElement(notFound));
     }
   }
+};
+
+const onFavoritesBtnClick = () =>{
+  debounce(toggleFavoriteView());
+};
+
+const initListener = () => {
+  favoriteBtn.addEventListener("click", onFavoritesBtnClick);   
+};
+   
+export const initFavorite = (cardsData) => {
+    favoriteData = cardsData;
+    initListener();
 };

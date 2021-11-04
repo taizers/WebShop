@@ -1,25 +1,8 @@
 "use strict";
 
-import { fillHTMLTemplates, clearHTMLItem } from './render.js'
-
-export const CURRENCY = "₽";
-const ONE_DAY_IN_MS = 86400000;
-const TWO_DAYS_IN_MS = 172800000;
-
-const months = [
-  'января',
-  'февраля',
-  'марта',
-  'апреля',
-  'мая',
-  'июня',
-  'июля',
-  'августа',
-  'сентября',
-  'октября',
-  'ноября',
-  'декабря'
-];
+import { clearHTMLItem, renderElement } from './render.js';
+import { getProductsDate, numberWithSpaces, CURRENCY } from './redactdata.js';
+import { setFavoriteStatus } from './favorites.js';
 
 const modal = document.querySelector(".popup");
 
@@ -35,33 +18,8 @@ const renderPhotos = (photos, name) => {
     return images;
 };
 
-export const getProductsDate = (productDate) => {
-    const date = Date.now();
-    if (productDate <= date && productDate > date - ONE_DAY_IN_MS) {
-        return "Сегодня";
-    } else
-    if (productDate <= date - ONE_DAY_IN_MS && productDate > date - TWO_DAYS_IN_MS) {
-        return "Вчера";
-    }else
-    {
-        return `${new Date(productDate).getDay() + 1} ${months[new Date(productDate).getMonth()]} ${new Date(productDate).getFullYear()} года`;
-    };
-};
-
-export const numberWithSpaces = (x) => {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-};
-
-export const getCardContentData = (list, id) => {
-    for (let item of list) {
-        if (item.card_id === id) {
-        return item;
-        }
-    }
-};
-
 const productEventCard = (productData) =>{ 
-  const textTeg = `
+  const card = `
   <div class="popup__inner  ">
     <button class="popup__close" type="button" aria-label="Закрыть">
       <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
@@ -74,7 +32,7 @@ const productEventCard = (productData) =>{
     <div class="popup__columns">
       <div class="popup__left">
         <div class="popup__gallery gallery">
-          <button id= "${productData.card_id + "p"}" class="gallery__favourite fav-add ${(/*getproductsDataStorage() != null && getCardContentData(getproductsDataStorage(),productData.card_id) != null*/ productData.favorite) ? "fav-add--checked" : ""}">
+          <button class="gallery__favourite fav-add ${(productData.favorite) ? "fav-add--checked" : ""}">
             <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path fill-rule="evenodd" clip-rule="evenodd" d="M3 7C3 13 10 16.5 11 17C12 16.5 19 13 19 7C19 4.79086 17.2091 3 15 3C12 3 11 5 11 5C11 5 10 3 7 3C4.79086 3 3 4.79086 3 7Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
             </svg>
@@ -123,44 +81,13 @@ const productEventCard = (productData) =>{
       </div>
       <div class="popup__right">
         <div class="popup__map" id="map">
-         
         </div>
         <div class="popup__address">${productData.address.city}, ${productData.address.street}, ${productData.address.building}</div>
       </div>
     </div>
   </div>
 `;
-  return textTeg;
-};
-
-const setproductsDataStorage = (cards) => {
-  localStorage.setItem('cards', JSON.stringify(cards));
-};
-
-export const getproductsDataStorage = () => {
-  return JSON.parse(localStorage.getItem('cards'));
-};
-
-export const onFavoritesRemove = (cardData, elem) => {
-  const productsDataStorage = getproductsDataStorage() || [];
-  
-  if ((productsDataStorage != null && getCardContentData(productsDataStorage, cardData.card_id) != null) && cardData.favorite) {
-    elem.classList.remove("fav-add--checked");
-    productsDataStorage.splice(productsDataStorage.indexOf(cardData), 1);
-  }
-
-  setproductsDataStorage(productsDataStorage)
-};
-
-export const onFavoritesAdd = (cardData, elem) => {
-  const productsDataStorage = getproductsDataStorage() || [];
-  
-  if ( !((productsDataStorage != null && getCardContentData(productsDataStorage, cardData.card_id) != null) && cardData.favorite) ) {
-    elem.classList.add("fav-add--checked");
-    productsDataStorage.push(cardData);
-  }
-
-  setproductsDataStorage(productsDataStorage)
+  return card;
 };
 
 const addSwapOnGalery = (evt) =>{
@@ -203,14 +130,14 @@ const initMap = (cardData) =>{
   let map = L.map('map').setView([cardData.coordinates[0], cardData.coordinates[1]], 10);
   const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="copyright">Openstreetmap</a>'
-}).addTo(map);
+  }).addTo(map);
   const marker = L.marker([cardData.coordinates[0], cardData.coordinates[1]]).addTo(map);// центровать через свойства
 };
   
-export const onShowModalClick = (cardData, setFavoritStatus) => {
+export const onShowModalClick = (cardData) => {
     clearHTMLItem(modal);
-    fillHTMLTemplates(modal, productEventCard(cardData))
-    initModalListeners(findCloseButton(), findGaleryImageFavorite(),setFavoritStatus);
+    modal.insertAdjacentElement("beforeEnd", renderElement(productEventCard(cardData)));
+    initModalListeners(findCloseButton(), findGaleryImageFavorite(), cardData);
     initMap(cardData);
     openModal();
 };
@@ -246,37 +173,49 @@ const onModalOutLineClick = (evt) =>{
 };
 
 const synhCardAndModal = (id) => {
-    const card = document.getElementById(id).querySelector(".product__favourite");
+    let card = document.createElement('div');
+    document.querySelectorAll('.results__item').forEach(element => {
+      if (element.getAttribute('data-id') === id) {
+        card = element.querySelector(".product__favourite");
+      }
+    });
+
     card.classList.contains("fav-add--checked") ? card.classList.remove("fav-add--checked") : card.classList.add("fav-add--checked");
-  
 };
 
-const initModalListeners = (modalCloseBtn, favoriteBtn, setFavoritStatus) => { 
+ 
+
+const initModalListeners = (modalCloseBtn, favoriteBtn, cardData) => { 
     const onModalFavoriteClick = (evt) => {
-      const modalElement = evt.currentTarget;
-      setFavoritStatus(modalElement.parentElement.id, modalElement);
-      synhCardAndModal(modalElement.parentElement.id);
-    };  
-  
+      setFavoriteStatus(cardData, evt.currentTarget);
+      synhCardAndModal(cardData.card_id);
+    }; 
+
     favoriteBtn.addEventListener("click",onModalFavoriteClick);
+
     findGaleryImages().forEach(item => {
       item.addEventListener('click', addSwapOnGalery)
     });
+
     modalCloseBtn.addEventListener("click",onCloseBtnClick);
     modalCloseBtn.addEventListener("mouseover",onCloseBtnMove);
+
     document.addEventListener('keydown',onModalKeyDown); 
     window.addEventListener("click",onModalOutLineClick);
 };
 const removeModalListeners = (modalCloseBtn, favoriteBtn) => {
-    const onModalFavoriteClick = (evt) => {
-
+    const onModalFavoriteClick = () => {
     }; 
+    
     favoriteBtn.removeEventListener("click",onModalFavoriteClick);
+
     findGaleryImages().forEach(item => {
       item.removeEventListener('click', addSwapOnGalery)
     });
+
     modalCloseBtn.removeEventListener("click",onCloseBtnClick);
     modalCloseBtn.removeEventListener("mouseover",onCloseBtnMove);
+
     document.removeEventListener('keydown',onModalKeyDown); 
     window.removeEventListener("click",onModalOutLineClick);
 };

@@ -1,20 +1,19 @@
 "use strict";
 
-import { renderCatalogList } from './render-cards.js'
-import { productsCopyArr } from './filters.js'
+import { renderCatalogList } from './render-cards.js';
+import { filterDataCopy } from './filters.js';
+import { debounce } from './data.js';
 
 export const sortPriceBtn = document.getElementById("sort-cheap");
 export const sortPopularBtn = document.getElementById("sort-popular");
 export const sortDateBtn = document.getElementById("sort-new");
 
-/* export const getsortBtns = () =>{
-    const sortPriceBtn = document.getElementById("sort-cheap");
-    const sortPopularBtn = document.getElementById("sort-popular");
-    const sortDateBtn = document.getElementById("sort-new");
+/* export const getSortBtns = () =>{
+    return document.querySelectorAll(".sorting__order-tab input[name=sorting-order]");
 };
 
-getsortBtns(); */
-
+getsortBtns(); 
+ */
 const sortProductPrice = (firstElement, SecondElement) => {
   const firstElementSort = firstElement.price;
   const SecondElementSort = SecondElement.price;
@@ -29,49 +28,20 @@ const sortProductDate = (firstElement, SecondElement) => {
   return firstElementSort-SecondElementSort;
 };
 
-export const onSortClick = (productsCopy, setFavoritStatus) => {
-  const onSortPriceBtnClick = () => {
-    let arr = [];
-    if (productsCopyArr.length != 0) {
-      arr = productsCopyArr;
-    }else{
-      arr = productsCopy;
-    }
-    renderCatalogList(arr.sort(sortProductPrice), setFavoritStatus);
-  };
-  
-  const onSortDateBtnClick = () => {
-    let arr = [];
-    if (productsCopyArr.length != 0) {
-      arr = productsCopyArr;
-    }else{
-      arr = productsCopy;
-    }
-    renderCatalogList(arr.sort(sortProductDate).reverse(),setFavoritStatus);
-  };
-  
-  const onSortPopularBtnClick = () => {
-    renderCatalogList(productsCopy, setFavoritStatus);//тут заменил
-  };
-  
+const onSortPriceBtnClick = () => {
+  debounce(renderCatalogList(filterDataCopy.slice().sort(sortProductPrice)));
+};
+
+const onSortDateBtnClick = () => {
+  debounce(renderCatalogList(filterDataCopy.slice().sort(sortProductDate).reverse()));
+};
+
+const onSortPopularBtnClick = () => {
+  debounce(renderCatalogList(filterDataCopy.slice()));
+};
+
+export const onSortBtnsClick = () => {
   sortPriceBtn.addEventListener('click',onSortPriceBtnClick); 
   sortDateBtn.addEventListener('click',onSortDateBtnClick); 
   sortPopularBtn.addEventListener('click',onSortPopularBtnClick); 
 };
-
-/* const onSortPriceBtnClick = () => {
-  renderCatalogList(productsCopyArr.sort(sortProductPrice));
-};
-
-const onSortDateBtnClick = () => {
-  renderCatalogList(productsCopyArr.sort(sortProductDate).reverse());
-};
-
-const onSortPopularBtnClick = () => {
-  console.log(productsCopyArr);
-  renderCatalogList(productsCopyArr);//тут заменил
-};
-
-sortPriceBtn.addEventListener('click',onSortPriceBtnClick); 
-sortDateBtn.addEventListener('click',onSortDateBtnClick); 
-sortPopularBtn.addEventListener('click',onSortPopularBtnClick);  */

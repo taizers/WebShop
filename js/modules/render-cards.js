@@ -1,13 +1,16 @@
 "use strict";
 
-import { onShowModalClick,  getCardContentData, getProductsDate, numberWithSpaces, CURRENCY } from './open-modal.js';
-import { fillHTMLTemplates, clearHTMLItem } from './render.js';
+import { onShowModalClick } from './open-modal.js';
+import { clearHTMLItem, renderElement } from './render.js';
+import { setFavoriteStatus } from './favorites.js';
+import { getProductsDate, numberWithSpaces, CURRENCY } from './redactdata.js';
 
 export const catalogList = document.querySelector('.results__list');
+let cardsDataCopy = [];
 
-const productCard = (productData) =>{ 
-    const textTeg = `
-        <li class="results__item product" id = "${productData.card_id}">
+const getProductCard = (productData) =>{ //шаблон карточки
+    const card = `
+        <li class="results__item product" data-id = "${productData.card_id /* data-id */}">
             <button class="product__favourite fav-add ${(productData.favorite) ? "fav-add--checked" : ""} " type="button" aria-label="Добавить в избранное">
                 <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M3 7C3 13 10 16.5 11 17C12 16.5 19 13 19 7C19 4.79086 17.2091 3 15 3C12 3 11 5 11 5C11 5 10 3 7 3C4.79086 3 3 4.79086 3 7Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
@@ -26,51 +29,65 @@ const productCard = (productData) =>{
             </div>
         </li>
     `;
-    return textTeg;
+    return card;
 };
 
-
- 
-export const renderCatalogList = (productsData, setFavoritStatus) => {
-
-    clearHTMLItem(catalogList);
-
-    console.log(productsData);
-
-    productsData.forEach((it) => {//тут заменил копирование
-      fillHTMLTemplates(catalogList,productCard(it));
-    });
-
-    const onCardClick = (evt) => {
-        if (evt.target === evt.currentTarget.querySelector('img') || evt.target === evt.currentTarget.querySelector('a')) {
-          evt.preventDefault();
-          onShowModalClick(getCardContentData(productsData, evt.currentTarget.id),setFavoritStatus);
+export const getCardContentData = (list, id) => {
+    for (let item of list) {
+        if (item.card_id === id) {
+        return item;
         }
-    };
+    }
+};
 
-    const removeEventListenerCards = (cardsItems) => {
-        cardsItems.forEach((card) => {
-          card.removeEventListener('click', onCardClick)
-        });
-    };
+const onCardClick = (evt) => {
+    if (evt.target === evt.currentTarget.querySelector('img') || evt.target === evt.currentTarget.querySelector('a')) {
+      evt.preventDefault();
+      onShowModalClick(getCardContentData(cardsDataCopy, evt.currentTarget.getAttribute('data-id')));
+    }
+};
 
-    removeEventListenerCards(catalogList.querySelectorAll('.results__item'));
+const removeEventListenerCards = (cardsItems) => {
+    cardsItems.forEach((card) => {
+      card.removeEventListener('click', onCardClick)
+    });
+};
 
-    const heards = catalogList.querySelectorAll(".product__favourite");
-        
-    const onHeardClick = (evt) =>{
-        const card = evt.currentTarget;
-        setFavoritStatus(card.parentElement.id, card);
-    };
+const addEventListenerCards = (cardsItems) =>{
+    cardsItems.forEach((card) => {
+      card.addEventListener('click', onCardClick)
+    });
+};
 
+const onHeardClick = (evt) =>{
+    const card = evt.currentTarget;
+    setFavoriteStatus(getCardContentData(cardsDataCopy, card.parentElement.getAttribute('data-id')), card);
+};
+
+const addEventListenerFavorite = (heards) =>{
     heards.forEach(element => {
         element.addEventListener("click",onHeardClick);
     });
+};
 
-    const addEventListenerCards = (cardsItems) =>{
-        cardsItems.forEach((card) => {
-          card.addEventListener('click', onCardClick)
-        });
-    };
+export const renderCatalogList = (cardsData) => {
+    cardsDataCopy = cardsData;
+    clearHTMLItem(catalogList);
+    removeEventListenerCards(catalogList.querySelectorAll('.results__item'));
+
+    console.log(cardsData);
+
+    const fragment = document.createDocumentFragment();
+
+    cardsData.forEach((it) => {
+      const card = renderElement(getProductCard(it));
+      fragment.appendChild(card);
+    });
+
+    catalogList.appendChild(fragment);
+
+    const heards = catalogList.querySelectorAll(".product__favourite");
+
+    addEventListenerFavorite(heards);
     addEventListenerCards(catalogList.querySelectorAll('.results__item'));
 };
