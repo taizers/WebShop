@@ -44,7 +44,7 @@ const setproductsDataStorage = (cards) => {
   localStorage.setItem('cards', JSON.stringify(cards));
 };
 
-const getproductsDataStorage = () => {
+export const getproductsDataStorage = () => {
   return JSON.parse(localStorage.getItem('cards'));
 };
 

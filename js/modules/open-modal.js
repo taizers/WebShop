@@ -18,7 +18,7 @@ const renderPhotos = (photos, name) => {
     return images;
 };
 
-const productEventCard = (productData) =>{ 
+const getProductModalSample = (productData) =>{ 
   const card = `
   <div class="popup__inner  ">
     <button class="popup__close" type="button" aria-label="Закрыть">
@@ -127,16 +127,25 @@ const onCloseBtnClick = () => {
 };
 
 const initMap = (cardData) =>{
-  let map = L.map('map').setView([cardData.coordinates[0], cardData.coordinates[1]], 10);
+  const mapOptions = {
+    center : [cardData.coordinates[0], cardData.coordinates[1]],
+    setView: [cardData.coordinates[0], cardData.coordinates[1]],
+    zoom: 13
+ }
+  let map = new L.map('map', mapOptions);
   const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="copyright">Openstreetmap</a>'
   }).addTo(map);
   const marker = L.marker([cardData.coordinates[0], cardData.coordinates[1]]).addTo(map);// центровать через свойства
+  //map.fitBounds([cardData.coordinates[0], cardData.coordinates[1]]);
+  map.panTo(new L.LatLng(cardData.coordinates[0], cardData.coordinates[1]));
+  map.setView([cardData.coordinates[0], cardData.coordinates[1]]);
+  map.setZoom(14);
 };
   
 export const onShowModalClick = (cardData) => {
     clearHTMLItem(modal);
-    modal.insertAdjacentElement("beforeEnd", renderElement(productEventCard(cardData)));
+    modal.insertAdjacentElement("beforeEnd", renderElement(getProductModalSample(cardData)));
     initModalListeners(findCloseButton(), findGaleryImageFavorite(), cardData);
     initMap(cardData);
     openModal();
@@ -183,8 +192,6 @@ const synhCardAndModal = (id) => {
     card.classList.contains("fav-add--checked") ? card.classList.remove("fav-add--checked") : card.classList.add("fav-add--checked");
 };
 
- 
-
 const initModalListeners = (modalCloseBtn, favoriteBtn, cardData) => { 
     const onModalFavoriteClick = (evt) => {
       setFavoriteStatus(cardData, evt.currentTarget);
@@ -206,7 +213,7 @@ const initModalListeners = (modalCloseBtn, favoriteBtn, cardData) => {
 const removeModalListeners = (modalCloseBtn, favoriteBtn) => {
     const onModalFavoriteClick = () => {
     }; 
-    
+
     favoriteBtn.removeEventListener("click",onModalFavoriteClick);
 
     findGaleryImages().forEach(item => {

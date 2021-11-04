@@ -2,16 +2,36 @@
 
 import { onShowModalClick } from './open-modal.js';
 import { clearHTMLItem, renderElement } from './render.js';
-import { setFavoriteStatus } from './favorites.js';
+import { setFavoriteStatus,getproductsDataStorage } from './favorites.js';
 import { getProductsDate, numberWithSpaces, CURRENCY } from './redactdata.js';
 
 export const catalogList = document.querySelector('.results__list');
 let cardsDataCopy = [];
 
-const getProductCard = (productData) =>{ //шаблон карточки
+export const getCardContentData = (list, id) => {
+    for (let item of list) {
+        if (item.card_id === id) {
+        return item;
+        }
+    }
+};
+
+const getFavoriteClass = (favoriteValueCard, cardId) => {
+    if (favoriteValueCard && getproductsDataStorage() != null && getCardContentData(getproductsDataStorage(),cardId) != null) {
+        return "+";
+    }else{
+        if (favoriteValueCard && getCardContentData(getproductsDataStorage(),cardId) != null) {
+            return true;
+        }else{
+            return false;
+        }
+    }
+};
+
+const getProductCardSample = (productData) =>{ //шаблон карточки
     const card = `
-        <li class="results__item product" data-id = "${productData.card_id /* data-id */}">
-            <button class="product__favourite fav-add ${(productData.favorite) ? "fav-add--checked" : ""} " type="button" aria-label="Добавить в избранное">
+        <li class="results__item product" data-id = "${productData.card_id}">
+            <button class="product__favourite fav-add ${getFavoriteClass(productData.favorite,productData.card_id) === "+" ? "fav-add--checked" : productData.favorite = getFavoriteClass(productData.favorite,productData.card_id)} " type="button" aria-label="Добавить в избранное">
                 <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M3 7C3 13 10 16.5 11 17C12 16.5 19 13 19 7C19 4.79086 17.2091 3 15 3C12 3 11 5 11 5C11 5 10 3 7 3C4.79086 3 3 4.79086 3 7Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
                 </svg>
@@ -30,14 +50,6 @@ const getProductCard = (productData) =>{ //шаблон карточки
         </li>
     `;
     return card;
-};
-
-export const getCardContentData = (list, id) => {
-    for (let item of list) {
-        if (item.card_id === id) {
-        return item;
-        }
-    }
 };
 
 const onCardClick = (evt) => {
@@ -80,7 +92,7 @@ export const renderCatalogList = (cardsData) => {
     const fragment = document.createDocumentFragment();
 
     cardsData.forEach((it) => {
-      const card = renderElement(getProductCard(it));
+      const card = renderElement(getProductCardSample(it));
       fragment.appendChild(card);
     });
 
