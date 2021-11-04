@@ -17,7 +17,7 @@ const months = [
     'октября',
     'ноября',
     'декабря'
-  ];
+];
 
 export const getProductsDate = (productDate) => {
     const date = Date.now();

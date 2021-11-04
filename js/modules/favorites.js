@@ -19,6 +19,9 @@ const disableSortElements = () =>{
   sortPopularBtn.disabled = false;
   sortDateBtn.disabled = false;
   document.getElementById("square").disabled = false;
+  document.querySelectorAll(".rs-pointer").forEach(element => {
+    element.disabled = false;
+  });
   filterForm.childNodes.forEach(element => {
     element.disabled = false;
     element.childNodes.forEach(elementChild => {
@@ -32,6 +35,9 @@ const turningOnSortElements = () =>{
   sortPopularBtn.disabled = true;
   sortDateBtn.disabled = true;
   document.getElementById("square").disabled = true;
+  document.querySelectorAll(".rs-pointer").forEach(element => {
+    element.disabled = true;
+  });
   filterForm.childNodes.forEach(element => {
     element.disabled = true;
     element.childNodes.forEach(elementChild => {
@@ -95,12 +101,12 @@ const toggleFavoriteView = () =>{
     favoriteDataCopy = getproductsDataStorage();
     turningOnSortElements();
     
-    if (favoriteDataCopy != null) {
+    if (favoriteDataCopy != null && favoriteDataCopy.length != 0) {
       renderCatalogList(favoriteDataCopy);
     }
     else{
       clearHTMLItem(catalogList);
-     catalogList.insertAdjacentElement("beforeEnd", renderElement(notFound));
+      catalogList.insertAdjacentElement("beforeEnd", renderElement(notFound));
     }
   }
 };

@@ -1,6 +1,6 @@
 "use strict";
 
-import './rSlider.min.js';
+import '../lib/rSlider.min.js';
 
 const MIN_PRICE = 1000000;
 const MAX_PRICE = 40000000;
@@ -57,8 +57,6 @@ export const adapter = (cards) => {
     });
     return cardsList;
 };
-
-let lastTimeout; 
 
 export function debounce(fn) {
     let isCooldown = false;
