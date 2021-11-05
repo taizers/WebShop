@@ -4,28 +4,30 @@ import { renderCatalogList } from './render-cards.js';
 import { filterDataCopy } from './filters.js';
 import { debounce } from './data.js';
 
-export const sortPriceBtn = document.getElementById("sort-cheap");
-export const sortPopularBtn = document.getElementById("sort-popular");
-export const sortDateBtn = document.getElementById("sort-new");
-
-/* export const getSortBtns = () =>{
-    return document.querySelectorAll(".sorting__order-tab input[name=sorting-order]");
+export const getSortPriceBtn = () => {
+  return document.querySelector("#sort-cheap");
 };
 
-getsortBtns(); 
- */
+export const getSortDateBtn = () => {
+  return document.querySelector("#sort-new");
+};
+
+export const getSortPopularBtn = () => {
+  return document.querySelector("#sort-popular");
+};
+
 const sortProductPrice = (firstElement, SecondElement) => {
   const firstElementSort = firstElement.price;
   const SecondElementSort = SecondElement.price;
-  
-  return firstElementSort-SecondElementSort;
+
+  return firstElementSort - SecondElementSort;
 };
 
 const sortProductDate = (firstElement, SecondElement) => {
   const firstElementSort = firstElement.publishDate;
   const SecondElementSort = SecondElement.publishDate;
-  
-  return firstElementSort-SecondElementSort;
+
+  return firstElementSort - SecondElementSort;
 };
 
 const onSortPriceBtnClick = () => {
@@ -41,7 +43,7 @@ const onSortPopularBtnClick = () => {
 };
 
 export const onSortBtnsClick = () => {
-  sortPriceBtn.addEventListener('click',onSortPriceBtnClick); 
-  sortDateBtn.addEventListener('click',onSortDateBtnClick); 
-  sortPopularBtn.addEventListener('click',onSortPopularBtnClick); 
+  getSortPriceBtn().addEventListener('click', onSortPriceBtnClick);
+  getSortDateBtn().addEventListener('click', onSortDateBtnClick);
+  getSortPopularBtn().addEventListener('click', onSortPopularBtnClick);
 };

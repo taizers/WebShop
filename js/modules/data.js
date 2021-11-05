@@ -1,29 +1,6 @@
 "use strict";
 
-import '../lib/rSlider.min.js';
-
-const MIN_PRICE = 1000000;
-const MAX_PRICE = 40000000;
 const DEBOUNCE_INTERVAL = 500;
-
-const getSliderValues = () => {
-    const pricesValues = [];
-    for (let i = MIN_PRICE; i < MAX_PRICE + 1; i += 10000) {
-        pricesValues.push(i);
-    }
-    return pricesValues;
-};
-
-const mySlider = new rSlider({
-    target: '#sampleSlider',
-    values: getSliderValues(),
-    range: true,
-    tooltip: true,
-    scale: true,
-    labels: true,
-    set: [MIN_PRICE, MAX_PRICE],
-    step: 10000,
-});
 
 export const adapter = (cards) => {
     const cardsList = [];
@@ -58,15 +35,11 @@ export const adapter = (cards) => {
     return cardsList;
 };
 
-export function debounce(fn) {
-    let isCooldown = false;
-    return function() {
-        if (isCooldown) return;
-
-        fn.apply(this, arguments);
-
-        isCooldown = true;
-
-        setTimeout(() => isCooldown = false, DEBOUNCE_INTERVAL);
+export const debounce = (f) => {
+    let timeout;
+    return function () {
+        const funcSteps = () => { f.apply(this, arguments) }
+        clearTimeout(timeout);
+        timeout = setTimeout(funcSteps, DEBOUNCE_INTERVAL)
     };
 };

@@ -2,8 +2,8 @@
 
 import { onShowModalClick } from './open-modal.js';
 import { clearHTMLItem, renderElement } from './render.js';
-import { setFavoriteStatus,getproductsDataStorage } from './favorites.js';
-import { getProductsDate, numberWithSpaces, CURRENCY } from './redactdata.js';
+import { setFavoriteStatus, getproductsDataStorage } from './favorites.js';
+import { getProductsDate, numberWithSpaces} from './redactdata.js';
 
 export const catalogList = document.querySelector('.results__list');
 let cardsDataCopy = [];
@@ -37,13 +37,13 @@ const getProductCardSample = (productData) =>{
                 </svg>
             </button>
             <div class="product__image">
-                <img src="${productData.photos[0]}" width="318" height="220" alt="${productData.name}">
+                <img src="${productData.photos != null ? productData.photos[0] : ""}" width="318" height="220" alt="${productData.name != null ? productData.name : ""}">
             </div>
             <div class="product__content">
                 <h3 class="product__title">
-                    <a href="#">${productData.name}</a>
+                    <a href="#">${productData.name != null ? productData.name : ""}</a>
                 </h3>
-                <div class="product__price">${numberWithSpaces(productData.price)} ${CURRENCY}</div>
+                <div class="product__price">${numberWithSpaces(productData.price)}</div>
                 <div class="product__address">${productData.address.city}, ${productData.address.street}</div>
                 <div class="product__date">${getProductsDate(productData.publishDate)}</div>
             </div>
@@ -82,6 +82,10 @@ const addEventListenerFavorite = (heards) =>{
     });
 };
 
+const getLikeBtns = () =>{
+    return catalogList.querySelectorAll(".product__favourite");
+};
+
 export const renderCatalogList = (cardsData) => {
     cardsDataCopy = cardsData;
     clearHTMLItem(catalogList);
@@ -98,8 +102,8 @@ export const renderCatalogList = (cardsData) => {
 
     catalogList.appendChild(fragment);
 
-    const heards = catalogList.querySelectorAll(".product__favourite");
+    //const heards = catalogList.querySelectorAll(".product__favourite");
 
-    addEventListenerFavorite(heards);
+    addEventListenerFavorite(getLikeBtns());
     addEventListenerCards(catalogList.querySelectorAll('.results__item'));
 };

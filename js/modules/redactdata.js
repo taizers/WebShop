@@ -1,6 +1,6 @@
 "use strict";
 
-export const CURRENCY = "₽";
+const CURRENCY = "₽";
 const ONE_DAY_IN_MS = 86400000;
 const TWO_DAYS_IN_MS = 172800000;
 
@@ -20,7 +20,8 @@ const months = [
 ];
 
 export const getProductsDate = (productDate) => {
-    const date = Date.now();
+    if (productDate != null) {
+        const date = Date.now();
     if (productDate <= date && productDate > date - ONE_DAY_IN_MS) {
         return "Сегодня";
     } else
@@ -29,9 +30,16 @@ export const getProductsDate = (productDate) => {
     }else
     {
         return `${new Date(productDate).getDay() + 1} ${months[new Date(productDate).getMonth()]} ${new Date(productDate).getFullYear()} года`;
-    };
+    }
+    }else
+    {
+        return "";
+    }
 };
 
-export const numberWithSpaces = (x) => {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+export const numberWithSpaces = (price) => {
+    if (price != null) {
+        return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " " + CURRENCY;
+    }else
+        return "";
 };
