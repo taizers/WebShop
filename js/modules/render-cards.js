@@ -29,7 +29,7 @@ const getFavoriteClass = (favoriteValueCard, cardId) => {
 };
 
 const getProductCardSample = (productData) =>{ 
-    const card = `
+    return `
         <li class="results__item product" data-id = "${productData.card_id}">
             <button class="product__favourite fav-add ${getFavoriteClass(productData.favorite,productData.card_id) === null ? "fav-add--checked" : productData.favorite = getFavoriteClass(productData.favorite,productData.card_id)} " type="button" aria-label="Добавить в избранное">
                 <svg width="22" height="20" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -49,7 +49,6 @@ const getProductCardSample = (productData) =>{
             </div>
         </li>
     `;
-    return card;
 };
 
 const onCardClick = (evt) => {
@@ -101,8 +100,6 @@ export const renderCatalogList = (cardsData) => {
     });
 
     catalogList.appendChild(fragment);
-
-    //const heards = catalogList.querySelectorAll(".product__favourite");
 
     addEventListenerFavorite(getLikeBtns());
     addEventListenerCards(catalogList.querySelectorAll('.results__item'));

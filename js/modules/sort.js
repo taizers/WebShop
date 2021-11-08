@@ -4,31 +4,21 @@ import { renderCatalogList } from './render-cards.js';
 import { filterDataCopy } from './filters.js';
 import { debounce } from './data.js';
 
-export const getSortPriceBtn = () => {
-  return document.querySelector("#sort-cheap");
+const sortPriceBtn = document.querySelector("#sort-cheap");
+const sortDateBtn =  document.querySelector("#sort-new");
+const sortPopularBtn  = document.querySelector("#sort-popular");
+
+export const getSortBtns = () => {
+  let sortBtns = [];
+  sortBtns.push(sortPriceBtn);
+  sortBtns.push(sortDateBtn);
+  sortBtns.push(sortPopularBtn);
+  return sortBtns;
 };
 
-export const getSortDateBtn = () => {
-  return document.querySelector("#sort-new");
-};
+const sortProductPrice = (firstElement, secondElement) => firstElement.price - secondElement.price;
 
-export const getSortPopularBtn = () => {
-  return document.querySelector("#sort-popular");
-};
-
-const sortProductPrice = (firstElement, SecondElement) => {
-  const firstElementSort = firstElement.price;
-  const SecondElementSort = SecondElement.price;
-
-  return firstElementSort - SecondElementSort;
-};
-
-const sortProductDate = (firstElement, SecondElement) => {
-  const firstElementSort = firstElement.publishDate;
-  const SecondElementSort = SecondElement.publishDate;
-
-  return firstElementSort - SecondElementSort;
-};
+const sortProductDate = (firstElement, secondElement) => firstElement.publishDate - secondElement.publishDate;
 
 const onSortPriceBtnClick = () => {
   debounce(renderCatalogList(filterDataCopy.slice().sort(sortProductPrice)));
@@ -42,8 +32,8 @@ const onSortPopularBtnClick = () => {
   debounce(renderCatalogList(filterDataCopy.slice()));
 };
 
-export const onSortBtnsClick = () => {
-  getSortPriceBtn().addEventListener('click', onSortPriceBtnClick);
-  getSortDateBtn().addEventListener('click', onSortDateBtnClick);
-  getSortPopularBtn().addEventListener('click', onSortPopularBtnClick);
+export const initSort = () => {
+  sortPriceBtn.addEventListener('click', onSortPriceBtnClick);
+  sortDateBtn.addEventListener('click', onSortDateBtnClick);
+  sortPopularBtn.addEventListener('click', onSortPopularBtnClick);
 };

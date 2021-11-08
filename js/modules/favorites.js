@@ -1,12 +1,13 @@
 "use strict";
 
-import { getSortDateBtn, getSortPriceBtn, getSortPopularBtn } from './sort.js';
-import { getFilterForm, filterDataCopy } from './filters.js';
+import { filterDataCopy } from './filters.js';
 import { renderCatalogList, catalogList, getCardContentData } from './render-cards.js';
 import { renderElement, clearHTMLItem } from './render.js';
 import { debounce } from './data.js';
+import { getSortBtns } from './sort.js';
 
 const favoriteBtn = document.querySelector(".sorting__favourites");
+const sortBtns = getSortBtns();
 
 const notFound = `<p style="text-align:center">«У вас пока нет избранных товаров. Чтобы
   отметить товар, кликните на сердечко в карточке объявления. Вы можете
@@ -14,14 +15,13 @@ const notFound = `<p style="text-align:center">«У вас пока нет из�
   избранные»</p>`;
 
 const disableSortElements = () => {
-  getSortPriceBtn().disabled = false;
-  getSortPopularBtn().disabled = false;
-  getSortDateBtn().disabled = false;
-  document.getElementById("square").disabled = false;
-  document.querySelectorAll(".rs-pointer").forEach(element => {
+  sortBtns.forEach(element => {
     element.disabled = false;
   });
-  getFilterForm().childNodes.forEach(element => {
+
+  document.querySelector("#square").disabled = false;
+
+  document.querySelector(".js-filter").childNodes.forEach(element => {
     element.disabled = false;
     element.childNodes.forEach(elementChild => {
       elementChild.disabled = false;
@@ -30,14 +30,13 @@ const disableSortElements = () => {
 };
 
 const turningOnSortElements = () => {
-  getSortPriceBtn().disabled = true;
-  getSortPopularBtn().disabled = true;
-  getSortDateBtn().disabled = true;
-  document.getElementById("square").disabled = true;
-  document.querySelectorAll(".rs-pointer").forEach(element => {
+  sortBtns.forEach(element => {
     element.disabled = true;
   });
-  getFilterForm().childNodes.forEach(element => {
+
+  document.querySelector("#square").disabled = true;
+
+  document.querySelector(".js-filter").childNodes.forEach(element => {
     element.disabled = true;
     element.childNodes.forEach(elementChild => {
       elementChild.disabled = true;
@@ -45,7 +44,7 @@ const turningOnSortElements = () => {
   });
 };
 
-const setproductsDataStorage = (cards) => {
+const setProductsDataStorage = (cards) => {
   localStorage.setItem('cards', JSON.stringify(cards));
 };
 
@@ -61,7 +60,7 @@ const onFavoritesRemove = (cardData, elem) => {
     productsDataStorage.splice(productsDataStorage.indexOf(cardData), 1);
   }
 
-  setproductsDataStorage(productsDataStorage)
+  setProductsDataStorage(productsDataStorage)
 };
 
 const onFavoritesAdd = (cardData, elem) => {
@@ -72,19 +71,15 @@ const onFavoritesAdd = (cardData, elem) => {
     productsDataStorage.push(cardData);
   }
 
-  setproductsDataStorage(productsDataStorage)
-};
-
-const toggleFavorite = (cardDataItem) => {
-  cardDataItem.favorite = !cardDataItem.favorite;
+  setProductsDataStorage(productsDataStorage);
 };
 
 export const setFavoriteStatus = (cardDataItem, elemetTarget) => {
   if (cardDataItem.favorite) {
-    toggleFavorite(cardDataItem);
+    cardDataItem.favorite = !cardDataItem.favorite;
     onFavoritesRemove(cardDataItem, elemetTarget);
   } else {
-    toggleFavorite(cardDataItem);
+    cardDataItem.favorite = !cardDataItem.favorite;
     onFavoritesAdd(cardDataItem, elemetTarget);
   }
 };

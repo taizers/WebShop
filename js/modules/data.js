@@ -35,10 +35,10 @@ export const adapter = (cards) => {
     return cardsList;
 };
 
-export const debounce = (f) => {
+export const debounce = (callBack) => {
     let timeout;
-    return function () {
-        const funcSteps = () => { f.apply(this, arguments) }
+    return () => {
+        const funcSteps = () => { callBack.apply(this, arguments) }
         clearTimeout(timeout);
         timeout = setTimeout(funcSteps, DEBOUNCE_INTERVAL)
     };

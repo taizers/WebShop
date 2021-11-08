@@ -5,37 +5,14 @@ import { renderCatalogList, catalogList } from './render-cards.js';
 import { renderElement, clearHTMLItem } from './render.js';
 import { debounce } from './data.js';
 
-let filterData = [];
-export let filterDataCopy = [];
-
-const getMinPrice = () => {
-  let min = filterDataCopy[0].price;
-  filterDataCopy.forEach(element => {
-    min = Math.min(min, element.price);
-  });
-  return min;
-};
-
-const getMaxPrice = () => {
-  let max = filterDataCopy[0].price;
-  filterDataCopy.forEach(element => {
-    max = Math.max(max, element.price);
-  });
-  return max;
-};
-
 const MIN_PRICE = 1000000;
 const MAX_PRICE = 30000000;
 
-const getSliderValues = () => {
-    const pricesValues = [];
-    for (let i = getMinPrice(); i < getMaxPrice() + 1; i += 10000) {
-        pricesValues.push(i);
-    }
-    return pricesValues;
-};
+let filterData = [];
+export let filterDataCopy = [];
+const filterForm = document.querySelector(".js-filter");
 
-const getStartSliderValues = () => {
+const getSliderValues = () => {
   const pricesValues = [];
   for (let i = MIN_PRICE; i < MAX_PRICE + 1; i += 10000) {
       pricesValues.push(i);
@@ -43,20 +20,16 @@ const getStartSliderValues = () => {
   return pricesValues;
 };
 
-let mySlider = new rSlider({
+const mySlider = new rSlider({
   target: '#sampleSlider',
   set: [MIN_PRICE, MAX_PRICE],
-  values: getStartSliderValues(),
+  values: getSliderValues(),
   range: true,
   tooltip: true,
   scale: true,
   labels: true,
   step: 10000,
 });
-
-export const getFilterForm = () => {
-  return document.querySelector(".js-filter");
-};
 
 const getSliderRange = (value) => {
   return value.split(',').map(item => +item);
@@ -100,16 +73,15 @@ const checkCardType = (cardType, house, flat, apartments) => {
 };
 
 const getFiltersData = () => {
-  const { sampleSlider, house, flat, apartments, square, rooms } = getFilterForm();
-  const values = {
+  const { sampleSlider, house, flat, apartments, square, rooms } = filterForm;
+  return {
     sampleSlider: getSliderRange(sampleSlider.value),
     house: house.checked,
     flat: flat.checked,
     apartments: apartments.checked,
     area: +square.value,
     rooms: rooms.value
-  }
-  return values;
+  };
 };
 
 const onFilterFormSubmit = (evt) => {
@@ -126,8 +98,6 @@ const onFilterFormSubmit = (evt) => {
   );
   if (filterDataCopy.length != 0) {
     debounce(renderCatalogList(filterDataCopy));
-    //mySlider.set = [getMinPrice(), getMaxPrice()];
-    //mySlider.values = getSliderValues();
   } else {
     clearHTMLItem(catalogList);
     debounce(catalogList.insertAdjacentElement("beforeEnd", renderElement(notFound)));
@@ -135,15 +105,12 @@ const onFilterFormSubmit = (evt) => {
 };
 
 const initListener = () => {
-  getFilterForm().addEventListener("submit", onFilterFormSubmit);
+  filterForm.addEventListener("submit", onFilterFormSubmit);
 };
 
 export const initFilters = (CardsData) => {
   filterData = CardsData;
   filterDataCopy = filterData.slice();
-
-  //mySlider.set = [getMinPrice(), getMaxPrice()];
-  //mySlider.values = getSliderValues();
  
   initListener();
 };

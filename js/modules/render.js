@@ -1,9 +1,9 @@
 "use strict"
 
 export const renderElement = (card) =>{
-    const d = document.createElement('div');
-    d.insertAdjacentHTML("beforeEnd", card);
-    return d.firstElementChild;
+    const element = document.createElement('div');
+    element.insertAdjacentHTML("beforeEnd", card);
+    return element.firstElementChild;
 };
 
 export const clearHTMLItem = (item) => {
